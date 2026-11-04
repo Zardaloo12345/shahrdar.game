@@ -1,111 +1,154 @@
+/* ====================================================
+   STYLE.CSS - پروژه بازی شهردار
+   طراحی مینیمال و ریسپانسیو برای موبایل و دسکتاپ
+   ==================================================== */
+
+/* ---------- 1. Reset & Global Settings ---------- */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Tahoma, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-tap-highlight-color: transparent; /* حذف فلاش آبی روی کلیک در موبایل */
+    user-select: none; /* جلوگیری از انتخاب متن */
+}
+
+:root {
+    /* متغیرهای رنگی برای تغییر آسان تم */
+    --bg-color: #1a3a5c;
+    --text-color: #ffffff;
+    --btn-bg: rgba(255, 255, 255, 0.15);
+    --btn-border: rgba(255, 255, 255, 0.5);
+    --btn-active: rgba(255, 255, 255, 0.35);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* جلوگیری از اسکرول شدن صفحه */
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 body {
-    background-color: #1a3a5c;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    min-height: 100vh;
-    overflow: hidden;
 }
 
-/* --- صحنه اصلی --- */
+/* ---------- 2. Game Container ---------- */
+.game-container {
+    width: 100%;
+    height: 100%;
+    max-width: 600px; /* محدودیت عرض برای تبلت و دسکتاپ */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 20px 0 40px 0;
+}
+
+/* ---------- 3. Scene (Platform & Characters) ---------- */
 .scene {
     width: 100%;
-    max-width: 400px;
-    height: 60vh; /* فضای بیشتر برای سکو */
+    height: 55vh; /* نیمی از صفحه برای صحنه بازی */
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 10px;
+    perspective: 800px; /* ایجاد فضای سه بعدی */
 }
 
-/* سکو (بزرگتر و واضح) */
+/* سکوی کهربایی */
 .platform-img {
     position: absolute;
     width: 95%;
-    max-width: 350px;
+    max-width: 380px;
     height: auto;
     object-fit: contain;
     z-index: 1;
-    /* کج کردن سکو برای حالت سه بعدی */
-    transform: perspective(800px) rotateX(45deg); 
+    transform: rotateX(45deg); /* کج کردن سکو */
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.5));
 }
 
-/* شخصیت‌ها (همه روی سکو) */
+/* استایل پایه برای همه شخصیت‌ها */
 .char-img {
     position: absolute;
     height: auto;
     z-index: 2;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.4)); /* سایه برای نشستن روی سکو */
 }
 
-/* شهروند: سمت چپ */
+/* 3.1 شهروند (پایین سمت چپ) */
 .citizen {
-    width: 30px; /* کوچیک شد */
-    bottom: 35%; /* اومد بالاتر روی سکو */
-    left: 20%;
-    animation: walk 4s infinite alternate ease-in-out;
-}
-
-/* سازنده‌ها: وسط، کنار هم */
-#builder1 {
-    width: 35px; /* کوچیک شد */
-    bottom: 35%;
-    left: 40%;
-}
-
-#builder2 {
     width: 35px;
-    bottom: 35%;
-    right: 40%;
-}
-
-/* شهردار: وسط و بالاتر */
-.mayor {
-    width: 40px; /* کوچیک شد */
-    bottom: 45%; /* بالاتر از بقیه */
-    left: 50%;
-    transform: translateX(-50%); /* دقیقاً وسط */
-    z-index: 5;
-}
-
-/* انیمیشن چکش زدن */
-.hammering {
-    animation: hitHammer 0.3s infinite alternate;
-}
-
-@keyframes hitHammer {
-    0% { transform: translateY(0) rotate(0deg); }
-    100% { transform: translateY(-8px) rotate(-15deg); }
-}
-
-/* محل ساختمان (وسط سکو) */
-.building-spot {
-    width: 45px;
-    height: 45px;
-    position: absolute;
-    bottom: 40%;
-    left: 50%;
-    transform: translate(-50%, 50%) scale(0);
+    bottom: 30%;
+    left: 20%;
     z-index: 3;
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+    animation: walkCitizen 4s infinite alternate ease-in-out;
+}
+
+/* 3.2 سازنده ۱ (چپ وسط) */
+#builder1 {
+    width: 40px;
+    bottom: 34%;
+    left: 38%;
+    z-index: 3;
+}
+
+/* 3.3 سازنده ۲ (راست وسط) */
+#builder2 {
+    width: 40px;
+    bottom: 34%;
+    right: 38%;
+    z-index: 3;
+}
+
+/* 3.4 شهردار (وسط و بالاترین نقطه) */
+.mayor {
+    width: 50px;
+    bottom: 45%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5; /* بالاتر از بقیه برای جلوگیری از تداخل */
+}
+
+/* ---------- 4. Building Spot (محل ساخت) ---------- */
+.building-spot {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 38%;
+    left: 50%;
+    transform: translate(-50%, 50%) scale(0); /* مخفی در ابتدا */
+    z-index: 4;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
     opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .building-spot.built {
-    transform: translate(-50%, 50%) scale(1);
+    transform: translate(-50%, 50%) scale(1); /* نمایش با بزرگنمایی */
     opacity: 1;
 }
 
-/* --- کنترل‌ها --- */
+.building-spot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+}
+
+/* ---------- 5. Controls (دکمه‌های پایین) ---------- */
 .controls {
     width: 100%;
     max-width: 500px;
@@ -113,35 +156,113 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
-    margin-bottom: 40px;
+    z-index: 10;
 }
 
+.control-left, .control-right {
+    display: flex;
+    gap: 15px;
+}
+
+/* استایل دکمه‌های دایره‌ای */
 .action-btn {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    color: white;
-    font-size: 14px;
+    background-color: var(--btn-bg);
+    border: 2px solid var(--btn-border);
+    color: var(--text-color);
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.1s;
+    box-shadow: 0 6px 10px var(--shadow-color);
+    transition: transform 0.1s ease, background-color 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
 }
 
 .action-btn:active {
-    transform: scale(0.95);
-    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(0.92); /* افکت فشرده شدن */
+    background-color: var(--btn-active);
 }
 
+.action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* دکمه‌های کوچک‌تر سمت راست */
 .control-right .action-btn {
     width: 60px;
     height: 60px;
     font-size: 13px;
 }
 
-@keyframes walk {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(30px); }
+/* ---------- 6. Animations ---------- */
+@keyframes walkCitizen {
+    0% { transform: translateX(0) scaleX(1); }
+    100% { transform: translateX(30px) scaleX(1); }
+}
+
+.hammering {
+    animation: hitHammer 0.25s infinite alternate ease-in-out;
+}
+
+@keyframes hitHammer {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-10px) rotate(-15deg); }
+}
+
+/* ---------- 7. Media Queries (Responsive) ---------- */
+/* برای موبایل‌های کوچک */
+@media (max-width: 480px) {
+    .scene {
+        height: 45vh;
+    }
+    .platform-img {
+        max-width: 280px;
+    }
+    .citizen { width: 30px; bottom: 28%; left: 18%; }
+    #builder1 { width: 35px; bottom: 32%; left: 36%; }
+    #builder2 { width: 35px; bottom: 32%; right: 36%; }
+    .mayor { width: 45px; bottom: 42%; }
+    
+    .action-btn {
+        width: 65px;
+        height: 65px;
+        font-size: 13px;
+    }
+    .control-right .action-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 12px;
+    }
+}
+
+/* برای دسکتاپ‌های بزرگ (بزرگتر از 768px) */
+@media (min-width: 768px) {
+    .scene {
+        height: 60vh;
+    }
+    .platform-img {
+        max-width: 450px;
+    }
+    .citizen { width: 45px; bottom: 32%; left: 22%; }
+    #builder1 { width: 50px; bottom: 36%; left: 40%; }
+    #builder2 { width: 50px; bottom: 36%; right: 40%; }
+    .mayor { width: 60px; bottom: 47%; }
+    
+    .action-btn {
+        width: 90px;
+        height: 90px;
+        font-size: 18px;
+    }
+    .control-right .action-btn {
+        width: 75px;
+        height: 75px;
+        font-size: 15px;
+    }
 }
