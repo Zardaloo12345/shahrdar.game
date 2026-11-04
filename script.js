@@ -1,81 +1,95 @@
-const wheelRing = document.getElementById('wheel-ring');
-const spinBtn = document.getElementById('spin-btn');
+const joystickContainer = document.getElementById('joystick-container');
+const joystickKnob = document.getElementById('joystick-knob');
+const mayor = document.getElementById('mayor-img');
+const buildBtn = document.getElementById('build-btn');
+const buildingSpot = document.getElementById('building-spot');
 const builder1 = document.getElementById('builder1');
 const builder2 = document.getElementById('builder2');
-const buildingSpot = document.getElementById('building-spot');
-const icons = document.querySelectorAll('.wheel-icon');
 
-let currentRotation = 0;
-const angleStep = 90; // آیکون‌ها هر ۹۰ درجه هستن
+// مختصات اولیه شهردار روی سکو (درصدی)
+let mayorX = 50; 
+let mayorY = 45; 
+const maxMoveX = 15; // چقدر چپ و راست بره
+const maxMoveY = 15; // چقدر بالا و پایین بره
 
-// لیست نیازها (به ترتیب چرخش)
-const needs = ['water', 'fire', 'edu', 'health'];
+// --- منطق جوی‌استیک (حرکت) ---
+let isDragging = false;
 
-spinBtn.addEventListener('click', () => {
-    // ۳۶۰ درجه چرخش کامل (یک دور کامل)
-    currentRotation += 360;
-    
-    // اعمال چرخش
-    wheelRing.style.transform = `rotate(${currentRotation}deg)`;
-
-    // صبر میکنیم چرخش تموم بشه بعدش آیکون بالای سر شهردار رو پیدا میکنیم
-    setTimeout(() => {
-        // پیدا کردن آیکون در بالای دایره
-        // به دلیل چرخش کامل، ایندکس آیکون بالای دایره رو باید پیدا کنیم
-        // برای ساده‌سازی، بعد از یک دور کامل، ایندکس ۰ (آب) رو انتخاب میکنیم
-        // و بعد میریم سراغ ایندکس بعدی
-        const normalizedRotation = currentRotation % 360;
-        let activeIndex = 0;
-
-        if (normalizedRotation === 90) activeIndex = 1;
-        if (normalizedRotation === 180) activeIndex = 2;
-        if (normalizedRotation === 270) activeIndex = 3;
-        if (normalizedRotation === 0) activeIndex = 0;
-
-        const needType = needs[activeIndex];
-
-        // ساخت ساختمان
-        triggerBuilders(needType);
-
-        // ریست کردن چرخش بعدی (برای اینکه دوباره از ۰ شروع شه)
-        // اما چون چرخش ۳۶۰ درجه‌ای هست، دوباره ۳۶۰ اضافه میشه که همون ۰ در نظر گرفته میشه
-        currentRotation = normalizedRotation;
-
-    }, 600); // صبر میکنیم انیمیشن چرخش تموم بشه
+joystickContainer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    moveKnob(e);
 });
 
-function triggerBuilders(need) {
-    spinBtn.disabled = true;
-    spinBtn.style.opacity = '0.5';
+document.addEventListener('mousemove', (e) => {
+    if (isDragging) moveKnob(e);
+});
 
-    // شروع انیمیشن چکش زدن
-    builder1.classList.add('hammering');
-    builder2.classList.add('hammering');
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+    joystickKnob.style.transform = 'translate(0, 0)'; // برگشت به مرکز
+    // برگشت شهردار به حالت اولیه یا نگه داشتن موقعیت فعلی
+});
 
-    // مخفی کردن ساختمان قبلی
-    buildingSpot.classList.remove('built');
-    buildingSpot.innerHTML = '';
+// برای لمس در موبایل
+joystickContainer.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    moveKnob(e.touches[0]);
+    e.preventDefault();
+});
+document.addEventListener('touchmove', (e) => {
+    if (isDragging) moveKnob(e.touches[0]);
+});
+document.addEventListener('touchend', () => {
+    isDragging = false;
+    joystickKnob.style.transform = 'translate(0, 0)';
+});
 
-    setTimeout(() => {
-        let buildingImg = '';
-        
-        switch(need) {
-            case 'water': buildingImg = 'icon-water.png'; break;
-            case 'fire': buildingImg = 'icon-fire.png'; break;
-            case 'edu': buildingImg = 'icon-education.png'; break;
-            case 'health': buildingImg = 'icon-hospital.png'; break;
-        }
+function moveKnob(event) {
+    const rect = joystickContainer.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
 
-        buildingSpot.innerHTML = `<img src="${buildingImg}" style="width: 100%; height: 100%; object-fit: contain;">`;
-        buildingSpot.classList.add('built');
+    // محاسبه فاصله از مرکز
+    let deltaX = event.clientX - centerX;
+    let deltaY = event.clientY - centerY;
 
-        // توقف چکش زدن
-        builder1.classList.remove('hammering');
-        builder2.classList.remove('hammering');
+    // محدود کردن دایره (شعاع ۳۰ پیکسل)
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const maxRadius = 30;
 
-        // فعال کردن دکمه
-        spinBtn.disabled = false;
-        spinBtn.style.opacity = '1';
+    if (distance > maxRadius) {
+        deltaX = (deltaX / distance) * maxRadius;
+        deltaY = (deltaY / distance) * maxRadius;
+    }
 
-    }, 1200);
+    // حرکت دادن دستگیره
+    joystickKnob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+    // حرکت دادن شهردار روی سکو بر اساس درصد
+    // اگر دستگیره به راست رفت، شهردار به راست می‌ره
+    mayorX = 50 + (deltaX / maxRadius) * maxMoveX;
+    mayorY = 45 - (deltaY / maxRadius) * maxMoveY; // منفی چون Y در CSS برعکس است
+
+    // اعمال موقعیت جدید شهردار
+    mayor.style.left = mayorX + '%';
+    mayor.style.bottom = mayorY + '%';
 }
+
+// --- دکمه ساخت ---
+buildBtn.addEventListener('click', () => {
+    // انیمیشن چکش زدن سازنده‌ها
+    builder1.style.transform = 'rotate(-20deg) translateY(-10px)';
+    builder2.style.transform = 'rotate(-20deg) translateY(-10px)';
+    
+    setTimeout(() => {
+        builder1.style.transform = 'rotate(0) translateY(0)';
+        builder2.style.transform = 'rotate(0) translateY(0)';
+    }, 300);
+
+    // ساختمان رو نشون بده
+    const icons = ['icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg'];
+    const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+    
+    buildingSpot.innerHTML = `<img src="${randomIcon}" style="width:100%; height:100%; object-fit:contain;">`;
+    buildingSpot.classList.add('built');
+});
