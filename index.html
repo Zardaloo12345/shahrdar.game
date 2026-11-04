@@ -4,7 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>شهردار | بازی</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ================= استایل‌ها ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Tahoma, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #1a3a5c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-bottom: 20px;
+        }
+
+        /* --- صحنه بازی --- */
+        .scene {
+            width: 100%;
+            height: 60vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .platform-img {
+            position: absolute;
+            width: 90%;
+            max-width: 350px;
+            transform: perspective(800px) rotateX(45deg);
+            z-index: 1;
+        }
+
+        .char-img {
+            position: absolute;
+            z-index: 2;
+            transition: all 0.2s ease;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+
+        .citizen {
+            width: 35px;
+            bottom: 40%;
+            left: 20%;
+        }
+        #builder1 {
+            width: 40px;
+            bottom: 40%;
+            right: 35%;
+        }
+        #builder2 {
+            width: 40px;
+            bottom: 40%;
+            right: 25%;
+        }
+        .mayor {
+            width: 50px;
+            bottom: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        /* --- کنترل‌ها --- */
+        .controls {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .joystick-container {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .joystick-knob {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            position: absolute;
+            transition: transform 0.1s ease-out;
+        }
+
+        .action-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.6);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .action-btn:active {
+            background-color: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+        }
+
+        /* محل ساخت */
+        .building-spot {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 38%;
+            left: 50%;
+            transform: translate(-50%, 50%) scale(0);
+            z-index: 4;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            opacity: 0;
+        }
+        .building-spot.built {
+            transform: translate(-50%, 50%) scale(1);
+            opacity: 1;
+        }
+        .building-spot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
@@ -13,34 +160,118 @@
         <div class="scene" id="scene">
             <img src="platform.jpg" alt="سکو" class="platform-img">
             
-            <!-- شهردار (وسط) -->
             <img src="mayor.jpg" alt="شهردار" class="char-img mayor" id="mayor-img">
-            
-            <!-- شهروند (چپ) -->
             <img src="citizen.jpg" alt="شهروند" class="char-img citizen" id="citizen">
-            
-            <!-- سازنده ۱ (راست) -->
-            <img src="builder.jpg" alt="سازنده" class="char-img builder" id="builder1">
-            <!-- سازنده ۲ (راست) -->
-            <img src="builder.jpg" alt="سازنده" class="char-img builder" id="builder2">
+            <img src="builder.jpg" alt="سازنده ۱" class="char-img builder" id="builder1">
+            <img src="builder.jpg" alt="سازنده ۲" class="char-img builder" id="builder2">
 
-            <!-- محل ساختمان -->
             <div id="building-spot" class="building-spot"></div>
         </div>
 
         <!-- کنترل‌های پایین -->
         <div class="controls">
-            <!-- جوی‌استیک سمت چپ -->
             <div class="joystick-container" id="joystick-container">
-                <div class="joystick-base"></div>
                 <div class="joystick-knob" id="joystick-knob"></div>
             </div>
-            
-            <!-- دکمه ساخت سمت راست -->
             <button id="build-btn" class="action-btn">ساخت</button>
         </div>
 
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        // ================= کدهای جاوااسکریپت =================
+        
+        const joystickContainer = document.getElementById('joystick-container');
+        const joystickKnob = document.getElementById('joystick-knob');
+        const mayor = document.getElementById('mayor-img');
+        const buildBtn = document.getElementById('build-btn');
+        const buildingSpot = document.getElementById('building-spot');
+        const builder1 = document.getElementById('builder1');
+        const builder2 = document.getElementById('builder2');
+
+        // مختصات اولیه شهردار
+        let mayorX = 50; 
+        let mayorY = 45; 
+        const maxMoveX = 15;
+        const maxMoveY = 15;
+
+        // --- منطق جوی‌استیک ---
+        let isDragging = false;
+
+        joystickContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            moveKnob(e);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) moveKnob(e);
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            joystickKnob.style.transform = 'translate(0, 0)';
+        });
+
+        // لمس در موبایل
+        joystickContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            moveKnob(e.touches[0]);
+            e.preventDefault();
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) moveKnob(e.touches[0]);
+        });
+        
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+            joystickKnob.style.transform = 'translate(0, 0)';
+        });
+
+        function moveKnob(event) {
+            const rect = joystickContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            let deltaX = event.clientX - centerX;
+            let deltaY = event.clientY - centerY;
+
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxRadius = 30;
+
+            if (distance > maxRadius) {
+                deltaX = (deltaX / distance) * maxRadius;
+                deltaY = (deltaY / distance) * maxRadius;
+            }
+
+            joystickKnob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+            // حرکت شهردار
+            mayorX = 50 + (deltaX / maxRadius) * maxMoveX;
+            mayorY = 45 - (deltaY / maxRadius) * maxMoveY; // Y در CSS برعکس است
+
+            mayor.style.left = mayorX + '%';
+            mayor.style.bottom = mayorY + '%';
+        }
+
+        // --- دکمه ساخت ---
+        buildBtn.addEventListener('click', () => {
+            // انیمیشن چکش زدن
+            builder1.style.transform = 'rotate(-20deg) translateY(-10px)';
+            builder2.style.transform = 'rotate(-20deg) translateY(-10px)';
+            
+            setTimeout(() => {
+                builder1.style.transform = 'rotate(0) translateY(0)';
+                builder2.style.transform = 'rotate(0) translateY(0)';
+            }, 300);
+
+            // آیکون تصادفی
+            const icons = ['icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg'];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+            
+            buildingSpot.innerHTML = `<img src="${randomIcon}" alt="ساختمان">`;
+            buildingSpot.classList.add('built');
+        });
+    </script>
 </body>
 </html>
