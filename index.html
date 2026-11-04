@@ -8,9 +8,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; user-select: none; }
         body {
             background-color: #1a3a5c; display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden; flex-direction: column; transition: background-color 0.8s ease;
+            height: 100vh; overflow: hidden; flex-direction: column; 
         }
-        
+
         .game-container {
             width: 100%; max-width: 500px; height: 100%; display: flex;
             flex-direction: column; justify-content: space-between; padding-bottom: 20px; position: relative;
@@ -18,51 +18,69 @@
 
         /* نوار بالای صفحه */
         .top-bar {
-            position: absolute; top: 10px; left: 20px; right: 20px;
+            position: absolute; top: 10px; left: 15px; right: 15px;
             display: flex; justify-content: space-between; align-items: center; z-index: 10;
             color: white; font-weight: bold; font-size: 14px;
         }
-        .profile-info, .coin-info { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 20px; }
-        .coin-info { background: #f1c40f; color: #333; }
+        .profile-info { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; display: flex; flex-direction: column; align-items: flex-start; }
+        .profile-info .name { font-size: 14px; color: #f1c40f; }
+        .profile-info .id { font-size: 11px; color: #ccc; }
+        
+        .coin-info { background: #f1c40f; color: #333; padding: 5px 15px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
 
-        .top-right-buttons { display: flex; gap: 10px; }
+        .top-right-buttons { display: flex; gap: 10px; position: absolute; top: 10px; right: 15px; z-index: 10;}
         .icon-btn { background: rgba(0,0,0,0.4); border: none; color: white; font-size: 20px; padding: 5px 10px; border-radius: 50%; cursor: pointer; }
 
-        /* صحنه و زمین ۹ قسمتی */
-        .scene { width: 100%; height: 55vh; position: relative; display: flex; justify-content: center; align-items: center; margin-top: 30px; }
-        
-        .platform-img {
-            position: absolute; width: 95%; max-width: 380px;
-            transform: perspective(800px) rotateX(45deg); z-index: 1;
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.4)); 
+        /* صحنه بازی */
+        .scene { width: 100%; height: 60vh; position: relative; display: flex; justify-content: center; align-items: center; margin-top: 40px; }
+
+        /* زمین سه بعدی */
+        .ground-container {
+            position: absolute; width: 85%; max-width: 350px; height: 300px;
+            top: 50%; left: 50%; transform: translate(-50%, -50%) perspective(800px) rotateX(45deg);
+            transition: transform 0.5s ease, width 0.5s ease, height 0.5s ease;
+            z-index: 1; 
+            background-color: #e0cda9;
+            border-radius: 10px;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5);
+            border: 4px solid #b89b58;
         }
 
-        /* شبکه ۳x۳ برای ساخت */
+        /* شبکه ۳x۳ */
         .grid-container {
-            position: absolute; width: 85%; max-width: 340px; height: 300px;
-            top: 50%; left: 50%; transform: translate(-50%, -50%) perspective(800px) rotateX(45deg);
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
             display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-            z-index: 2; pointer-events: none; /* فقط وقتی فعال میشه که در حال ساختن باشیم */
+            z-index: 2; pointer-events: none;
         }
         .grid-container.active { pointer-events: all; }
 
         .grid-cell {
-            border: 2px dashed rgba(255,255,255,0.2); border-radius: 5px;
+            border: 1px dashed rgba(0,0,0,0.1); 
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer; transition: all 0.2s; position: relative;
         }
         .grid-cell:hover { background: rgba(255,255,255,0.2); }
-        .grid-cell.selected { background: rgba(76, 175, 80, 0.8); border-color: #fff; }
+        .grid-cell.selected { background: rgba(76, 175, 80, 0.5); border: 2px solid #4CAF50; }
 
-        /* جایگاه ساختمان‌ها و چمن */
+        /* محتویات خانه‌ها */
         .cell-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        .cell-content img { width: 80%; height: 80%; object-fit: contain; mix-blend-mode: multiply; }
-        .grass-icon { font-size: 30px; animation: sway 3s infinite alternate; }
+        
+        /* تصویر چمن (پسوند jpeg) */
+        .cell-content.grass-cell {
+            background-image: url('grass.jpeg'); 
+            background-size: cover; 
+            background-position: center;
+        }
 
-        @keyframes sway { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+        /* ساختمان‌ها */
+        .cell-content img.building-img { 
+            width: 90%; height: 90%; object-fit: contain; 
+            filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5));
+            mix-blend-mode: multiply;
+        }
 
-        /* شخصیت‌ها (خارج از شبکه) */
-        .char-img { position: absolute; z-index: 5; mix-blend-mode: multiply; transition: all 0.5s ease; }
+        /* شخصیت‌ها */
+        .char-img { position: absolute; z-index: 5; mix-blend-mode: multiply; transition: all 0.1s linear; }
         .mayor { width: 50px; bottom: 10%; left: 50%; transform: translateX(-50%); }
         #builder1 { width: 40px; bottom: 10%; right: 35%; }
         #builder2 { width: 40px; bottom: 10%; right: 25%; }
@@ -87,6 +105,7 @@
             display: flex; justify-content: center; align-items: center; cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
+        .action-btn:active { transform: scale(0.9); }
 
         /* مودال‌ها */
         .modal-overlay {
@@ -122,12 +141,11 @@
         .btn-reject { background-color: #f44336; }
         .btn-action { background-color: #2980b9; width: 100%; margin-top: 10px; }
 
-        .profile-form input, .friend-form input {
+        .profile-form input, .friend-form input, .attack-form input {
             width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; text-align: center;
         }
         .profile-form button { width: 100%; padding: 10px; background: #1a3a5c; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
 
-        /* نوتیفیکیشن کوچک */
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: #333; color: white; padding: 10px 20px; border-radius: 20px;
@@ -138,7 +156,7 @@
 </head>
 <body id="main-body">
     
-    <!-- مودال ساخت پروفایل -->
+    <!-- پروفایل -->
     <div class="modal-overlay active" id="profile-modal">
         <div class="modal-content profile-form">
             <h2>خوش آمدید، شهردار!</h2>
@@ -149,20 +167,21 @@
 
     <div class="game-container">
         <div class="top-bar">
-            <div class="profile-info">ID: <span id="display-id">---</span></div>
+            <div class="profile-info">
+                <span class="name" id="display-name">شهردار</span>
+                <span class="id">ID: <span id="display-id">---</span></span>
+            </div>
             <div class="coin-info">🪙 <span id="coin-count">۱۰۰</span></div>
         </div>
         
-        <div class="top-right-buttons" style="position: absolute; top: 10px; right: 20px; z-index: 10;">
+        <div class="top-right-buttons" style="position: absolute; top: 10px; right: 15px; z-index: 10;">
             <button class="icon-btn" id="friends-btn">👥</button>
+            <button class="icon-btn" id="attack-btn">⚔️</button>
         </div>
 
         <div class="scene" id="scene">
-            <img src="platform.jpg" alt="سکو" class="platform-img">
-            
-            <!-- شبکه ۳x۳ -->
-            <div class="grid-container" id="grid-container">
-                <!-- سلول‌ها با جاوااسکریپت ساخته میشن -->
+            <div class="ground-container" id="ground-container">
+                <div class="grid-container" id="grid-container"></div>
             </div>
 
             <img src="mayor.jpg" alt="شهردار" class="char-img mayor" id="mayor-img">
@@ -175,6 +194,7 @@
                 <div class="joystick-knob" id="joystick-knob"></div>
             </div>
             <div class="action-btn-group">
+                <button id="land-btn" class="action-btn">🌍</button>
                 <button id="grass-btn" class="action-btn">🌿</button>
                 <button id="hammer-btn" class="action-btn">🔨</button>
             </div>
@@ -186,6 +206,19 @@
         <div class="modal-content">
             <h2>چه ساختمانی بسازیم؟</h2>
             <div class="building-grid" id="building-grid"></div>
+        </div>
+    </div>
+
+    <!-- مودال حمله -->
+    <div class="modal-overlay" id="attack-modal">
+        <div class="modal-content">
+            <h2>حمله نظامی ⚔️</h2>
+            <p>شناسه دشمن را وارد کنید:</p>
+            <div class="attack-form">
+                <input type="text" id="enemy-id-input" placeholder="شناسه دشمن...">
+                <button class="modal-btn btn-action" id="launch-attack-btn" style="background:#c0392b;">شلیک جنگنده (نیاز به پادگان)</button>
+            </div>
+            <p style="font-size: 12px; margin-top: 10px; color: #777;">هر حمله موفق ۱۰ سکه از دشمن کم می‌کند.</p>
         </div>
     </div>
 
@@ -201,11 +234,10 @@
         </div>
     </div>
 
-    <!-- توست (پیام کوچک) -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ================= دیتا و ذخیره‌سازی =================
+        // ================= دیتا =================
         const buildingData = [
             { id: 'city_hall', img: 'city_hall.jpeg', price: 50, name: 'شهرداری' },
             { id: 'stadium', img: 'stadium.jpeg', price: 40, name: 'ورزشگاه' },
@@ -214,13 +246,11 @@
             { id: 'military_base', img: 'military_base.jpeg', price: 100, name: 'پادگان نظامی' }
         ];
 
-        // متغیرهای ذخیره‌سازی
         let userCoins = parseInt(localStorage.getItem('shahrdar_coins')) || 100;
         let userId = localStorage.getItem('shahrdar_id');
         let userProfile = localStorage.getItem('shahrdar_profile');
-        
-        // ذخیره خانه‌های ساخته شده (آرایه ۹ تایی: null یا {type, img})
         let cityGrid = JSON.parse(localStorage.getItem('shahrdar_city')) || Array(9).fill(null);
+        let landLevel = parseInt(localStorage.getItem('shahrdar_land')) || 1;
 
         if (!userId) {
             userId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -228,51 +258,44 @@
         }
 
         // المان‌ها
-        const body = document.getElementById('main-body');
-        const profileModal = document.getElementById('profile-modal');
-        const usernameInput = document.getElementById('username-input');
-        const saveProfileBtn = document.getElementById('save-profile-btn');
         const displayId = document.getElementById('display-id');
+        const displayName = document.getElementById('display-name');
         const coinCount = document.getElementById('coin-count');
-        const toast = document.getElementById('toast');
-        
         const gridContainer = document.getElementById('grid-container');
+        const groundContainer = document.getElementById('ground-container');
         const buildModal = document.getElementById('build-modal');
         const buildingGrid = document.getElementById('building-grid');
-        const friendsModal = document.getElementById('friends-modal');
-        const friendIdInput = document.getElementById('friend-id-input');
-        const addFriendBtn = document.getElementById('add-friend-btn');
-        const friendsList = document.getElementById('friends-list');
+        const toast = document.getElementById('toast');
         
-        const hammerBtn = document.getElementById('hammer-btn');
-        const grassBtn = document.getElementById('grass-btn');
-        const joystickContainer = document.getElementById('joystick-container');
-        const joystickKnob = document.getElementById('joystick-knob');
-
-        // ================= توابع کمکی =================
-        function showToast(message) {
-            toast.innerText = message;
+        function showToast(msg) {
+            toast.innerText = msg;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+            setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
         function updateUI() {
+            displayName.innerText = userProfile || 'شهردار';
             displayId.innerText = userId;
             coinCount.innerText = userCoins;
-            if (userProfile) profileModal.classList.remove('active');
+            if (userProfile) document.getElementById('profile-modal').classList.remove('active');
         }
         updateUI();
 
-        // ذخیره پروفایل
-        saveProfileBtn.addEventListener('click', () => {
-            const name = usernameInput.value.trim();
+        document.getElementById('save-profile-btn').addEventListener('click', () => {
+            const name = document.getElementById('username-input').value.trim();
             if (name === '') return alert('نام را وارد کنید!');
             userProfile = name;
             localStorage.setItem('shahrdar_profile', userProfile);
             updateUI();
         });
 
-        // ================= رسم شبکه ۳x۳ =================
+        // ================= زمین و شبکه =================
+        function applyLandSize() {
+            const scale = Math.pow(1.2, landLevel - 1);
+            groundContainer.style.transform = `translate(-50%, -50%) perspective(800px) rotateX(45deg) scale(${scale})`;
+        }
+        applyLandSize();
+
         function drawGrid() {
             gridContainer.innerHTML = '';
             for (let i = 0; i < 9; i++) {
@@ -280,155 +303,150 @@
                 cell.className = 'grid-cell';
                 cell.dataset.index = i;
                 
-                // اگر در این خانه چیزی ساخته شده
                 if (cityGrid[i]) {
                     const content = document.createElement('div');
                     content.className = 'cell-content';
                     if (cityGrid[i].type === 'grass') {
-                        content.innerHTML = `<span class="grass-icon">🌿</span>`;
+                        content.classList.add('grass-cell');
                     } else {
-                        content.innerHTML = `<img src="${cityGrid[i].img}" alt="${cityGrid[i].name}">`;
+                        content.innerHTML = `<img src="${cityGrid[i].img}" class="building-img" alt="${cityGrid[i].name}">`;
                     }
                     cell.appendChild(content);
                 }
                 
-                // رویداد کلیک برای انتخاب محل ساخت
                 cell.addEventListener('click', () => {
                     if (gridContainer.classList.contains('active')) {
-                        // اگر خانه خالی بود
                         if (!cityGrid[i]) {
-                            // انتخاب خانه
                             document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('selected'));
                             cell.classList.add('selected');
-                            // ذخیره انتخاب فعلی در متغیر گلوبال
                             window.selectedCellIndex = i;
                         } else {
-                            showToast('این خانه قبلاً پر شده است!');
+                            showToast('این خانه پر است!');
                         }
                     }
                 });
-                
                 gridContainer.appendChild(cell);
             }
-            // غیرفعال کردن شبکه در حالت عادی
-            gridContainer.classList.remove('active');
         }
         drawGrid();
 
-        // ================= دکمه چکش (ساخت) =================
-        hammerBtn.addEventListener('click', () => {
-            // پر کردن لیست ساختمان‌ها
+        // ================= دکمه‌ها =================
+        // ساخت
+        document.getElementById('hammer-btn').addEventListener('click', () => {
             buildingGrid.innerHTML = '';
-            buildingData.forEach((building) => {
+            buildingData.forEach((b) => {
                 const div = document.createElement('div');
                 div.className = 'building-item';
-                div.innerHTML = `<img src="${building.img}" alt="${building.name}"><span class="price-tag">${building.price} 🪙</span>`;
+                div.innerHTML = `<img src="${b.img}"><span class="price-tag">${b.price} 🪙</span>`;
                 div.onclick = () => {
-                    // بررسی سکه
-                    if (userCoins < building.price) {
-                        showToast('سکه کافی ندارید!');
-                        return;
-                    }
-                    // ذخیره ساختمان انتخاب شده
-                    window.pendingBuilding = building;
+                    if (userCoins < b.price) return showToast('سکه کافی ندارید!');
+                    window.pendingBuilding = b;
                     buildModal.classList.remove('active');
-                    
-                    // فعال کردن حالت انتخاب خانه
                     gridContainer.classList.add('active');
-                    showToast('یک خانه خالی را انتخاب کنید');
+                    showToast('یک خانه را انتخاب کنید');
                 };
                 buildingGrid.appendChild(div);
             });
             buildModal.classList.add('active');
         });
 
-        // ================= کلیک روی شبکه برای ساخت =================
+        // چمن
+        document.getElementById('grass-btn').addEventListener('click', () => {
+            if (userCoins < 10) return showToast('برای چمن ۱۰ سکه نیاز دارید!');
+            window.pendingBuilding = { type: 'grass', price: 10, name: 'چمن' };
+            gridContainer.classList.add('active');
+            showToast('یک خانه خالی انتخاب کنید');
+        });
+
+        // گسترش زمین
+        document.getElementById('land-btn').addEventListener('click', () => {
+            const cost = 100 * landLevel;
+            if (userCoins < cost) return showToast(`به ${cost} سکه نیاز دارید!`);
+            userCoins -= cost;
+            landLevel++;
+            localStorage.setItem('shahrdar_coins', userCoins.toString());
+            localStorage.setItem('shahrdar_land', landLevel.toString());
+            updateUI();
+            applyLandSize();
+            showToast(`زمین بزرگتر شد! سطح ${landLevel}`);
+        });
+
+        // ثبت ساخت
         gridContainer.addEventListener('click', (e) => {
             const cell = e.target.closest('.grid-cell');
             if (!cell) return;
-            
             const index = parseInt(cell.dataset.index);
             
-            // اگر در حالت ساخت هستیم و خانه خالی است
             if (window.pendingBuilding && !cityGrid[index]) {
-                const building = window.pendingBuilding;
-                
-                // کم کردن سکه
-                userCoins -= building.price;
+                const b = window.pendingBuilding;
+                userCoins -= b.price;
                 localStorage.setItem('shahrdar_coins', userCoins.toString());
-                updateUI();
                 
-                // ذخیره ساختمان در خانه
-                cityGrid[index] = { type: 'building', img: building.img, name: building.name };
+                cityGrid[index] = { type: b.type || 'building', img: b.img, name: b.name };
                 localStorage.setItem('shahrdar_city', JSON.stringify(cityGrid));
                 
-                // رسم مجدد شبکه
                 drawGrid();
-                
-                // پاک کردن حالت ساخت
+                updateUI();
                 window.pendingBuilding = null;
                 gridContainer.classList.remove('active');
-                showToast(`${building.name} ساخته شد!`);
+                showToast(`${b.name} ساخته شد!`);
             }
-        });
-
-        // ================= دکمه چمن (تزئینات) =================
-        grassBtn.addEventListener('click', () => {
-            if (userCoins < 10) {
-                showToast('برای کاشتن چمن به ۱۰ سکه نیاز دارید!');
-                return;
-            }
-            // فعال کردن حالت کاشتن چمن
-            window.pendingBuilding = { type: 'grass', price: 10, name: 'چمن' };
-            gridContainer.classList.add('active');
-            showToast('یک خانه خالی را برای کاشتن چمن انتخاب کنید');
         });
 
         // ================= دوستان =================
         document.getElementById('friends-btn').addEventListener('click', () => {
-            friendsModal.classList.add('active');
-            updateFriendsList();
+            document.getElementById('friends-modal').classList.add('active');
         });
 
-        addFriendBtn.addEventListener('click', () => {
-            const id = friendIdInput.value.trim();
-            if (id && id !== userId) {
-                // شبیه‌سازی ارسال درخواست
-                showToast(`درخواست دوستی برای شناسه ${id} ارسال شد.`);
-                // در این نسخه ساده، فرض میکنیم کاربر تایید میکند
-                const friends = JSON.parse(localStorage.getItem('shahrdar_friends')) || [];
-                if (!friends.includes(id)) {
-                    friends.push(id);
-                    localStorage.setItem('shahrdar_friends', JSON.stringify(friends));
-                }
-                friendIdInput.value = '';
-                updateFriendsList();
-            } else if (id === userId) {
-                showToast('نمی‌توانید خودتان را اضافه کنید!');
+        document.getElementById('add-friend-btn').addEventListener('click', () => {
+            const id = document.getElementById('friend-id-input').value.trim();
+            if (id) {
+                showToast(`درخواست برای ${id} ارسال شد.`);
+                document.getElementById('friend-id-input').value = '';
             }
         });
 
-        function updateFriendsList() {
-            const friends = JSON.parse(localStorage.getItem('shahrdar_friends')) || [];
-            friendsList.innerHTML = friends.length ? friends.map(f => `<div>👤 شناسه: ${f}</div>`).join('') : '<div>دوستان شما خالی است.</div>';
-        }
+        // ================= حمله و پادگان =================
+        document.getElementById('attack-btn').addEventListener('click', () => {
+            document.getElementById('attack-modal').classList.add('active');
+        });
 
-        // ================= جوی‌استیک (حرکت شهردار) =================
+        document.getElementById('launch-attack-btn').addEventListener('click', () => {
+            const enemyId = document.getElementById('enemy-id-input').value.trim();
+            if (!enemyId) return showToast('شناسه دشمن را وارد کنید!');
+            
+            // چک کردن وجود پادگان در زمین
+            let hasBase = cityGrid.some(cell => cell && cell.name === 'پادگان نظامی');
+            if (!hasBase) return showToast('ابتدا باید یک پادگان نظامی بسازید!');
+            
+            if (userCoins < 10) return showToast('برای شلیک جنگنده به ۱۰ سکه نیاز دارید!');
+
+            userCoins -= 10;
+            localStorage.setItem('shahrdar_coins', userCoins.toString());
+            updateUI();
+            
+            showToast(`حمله موفق! ۱۰ سکه از دشمن (${enemyId}) کم شد.`);
+            document.getElementById('attack-modal').classList.remove('active');
+            document.getElementById('enemy-id-input').value = '';
+        });
+
+        // ================= جوی‌استیک (سرعت زیاد) =================
         let mayorX = 50, mayorY = 10, isDragging = false;
         const mayor = document.getElementById('mayor-img');
         mayor.style.left = mayorX + '%';
         mayor.style.bottom = mayorY + '%';
 
-        joystickContainer.addEventListener('mousedown', (e) => { isDragging = true; moveKnob(e); });
+        document.getElementById('joystick-container').addEventListener('mousedown', (e) => { isDragging = true; moveKnob(e); });
         document.addEventListener('mousemove', (e) => { if (isDragging) moveKnob(e); });
-        document.addEventListener('mouseup', () => { isDragging = false; joystickKnob.style.transform = 'translate(0, 0)'; });
+        document.addEventListener('mouseup', () => { isDragging = false; document.getElementById('joystick-knob').style.transform = 'translate(0, 0)'; });
         
-        joystickContainer.addEventListener('touchstart', (e) => { isDragging = true; moveKnob(e.touches[0]); e.preventDefault(); });
+        document.getElementById('joystick-container').addEventListener('touchstart', (e) => { isDragging = true; moveKnob(e.touches[0]); e.preventDefault(); });
         document.addEventListener('touchmove', (e) => { if (isDragging) moveKnob(e.touches[0]); });
-        document.addEventListener('touchend', () => { isDragging = false; joystickKnob.style.transform = 'translate(0, 0)'; });
+        document.addEventListener('touchend', () => { isDragging = false; document.getElementById('joystick-knob').style.transform = 'translate(0, 0)'; });
 
         function moveKnob(event) {
-            const rect = joystickContainer.getBoundingClientRect();
+            const container = document.getElementById('joystick-container');
+            const rect = container.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             let deltaX = event.clientX - centerX;
@@ -439,12 +457,14 @@
                 deltaX = (deltaX / distance) * maxRadius;
                 deltaY = (deltaY / distance) * maxRadius;
             }
-            joystickKnob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            document.getElementById('joystick-knob').style.transform = `translate(${deltaX}px, ${deltaY}px)`;
             
-            mayorX = 50 + (deltaX / maxRadius) * 20;
-            mayorY = 10 - (deltaY / maxRadius) * 15;
+            // افزایش سرعت شهردار: ضریب از 10 به 30 تغییر کرد
+            mayorX = 50 + (deltaX / maxRadius) * 30;
+            mayorY = 10 - (deltaY / maxRadius) * 30;
             if (mayorY < 0) mayorY = 0;
-            if (mayorY > 30) mayorY = 30;
+            if (mayorY > 40) mayorY = 40; // اجازه حرکت تا بالای صفحه
+            
             mayor.style.left = mayorX + '%';
             mayor.style.bottom = mayorY + '%';
         }
