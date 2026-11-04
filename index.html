@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شهردار - بازی مینیمال</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        
+        <!-- صحنه اصلی بازی (سکوی کهربایی) -->
+        <div class="scene" id="scene">
+            <!-- سکو -->
+            <img src="platform.png" alt="سکو" class="platform-img" id="platform-img">
+            
+            <!-- شخصیت‌ها (با تنظیمات موقعیت دهی جدید) -->
+            <img src="citizen.png" alt="شهروند" class="char-img citizen" id="citizen">
+            <img src="builder.png" alt="سازنده ۱" class="char-img builder" id="builder1">
+            <img src="builder.png" alt="سازنده ۲" class="char-img builder" id="builder2">
+
+            <!-- محل قرارگیری ساختمان ساخته شده -->
+            <div id="building-spot" class="building-spot"></div>
+        </div>
+
+        <!-- بخش کنترل دایره‌ای -->
+        <div class="control-area">
+            <div class="wheel-container" id="wheel-container">
+                <div class="wheel-ring" id="wheel-ring">
+                    <img src="icon-water.png" alt="آب" class="wheel-icon" style="--angle: 0deg;" data-need="water">
+                    <img src="icon-fire.png" alt="آتش" class="wheel-icon" style="--angle: 90deg;" data-need="fire">
+                    <img src="icon-education.png" alt="آموزش" class="wheel-icon" style="--angle: 180deg;" data-need="edu">
+                    <img src="icon-hospital.png" alt="بیمارستان" class="wheel-icon" style="--angle: 270deg;" data-need="health">
+                </div>
+                <img src="mayor.png" alt="شهردار" class="mayor-img" id="mayor-img">
+            </div>
+            <button id="spin-btn">چرخش دایره</button>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
