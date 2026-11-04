@@ -1,0 +1,195 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Tahoma, sans-serif;
+}
+
+body {
+    background-color: #1a3a5c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    /* برای اینکه صفحه کاملاً عمودی باشه */
+    flex-direction: column; 
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px; /* محدود کردن عرض برای موبایل */
+    padding: 10px;
+}
+
+/* صحنه */
+.scene {
+    width: 300px;
+    height: 250px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* سکو (کج شده به صورت سه بعدی) */
+.platform-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 1;
+    /* کج کردن سکو */
+    transform: perspective(600px) rotateX(45deg); 
+}
+
+/* استایل شخصیت‌ها */
+.char-img {
+    position: absolute;
+    width: 50px; 
+    height: auto;
+    z-index: 2;
+    transition: all 0.3s ease;
+    /* قرار دادن شخصیت‌ها روی سطح کج */
+    transform-origin: bottom center;
+}
+
+/* شهروند (سمت چپ) */
+.citizen {
+    bottom: 30%; 
+    left: 15%;
+    width: 40px;
+    animation: walk 4s infinite alternate ease-in-out;
+}
+
+/* سازنده‌ها (وسط و راست) */
+#builder1 {
+    bottom: 25%;
+    left: 35%;
+    width: 45px;
+}
+
+#builder2 {
+    bottom: 25%;
+    right: 35%;
+    width: 45px;
+}
+
+/* انیمیشن چکش زدن */
+.hammering {
+    animation: hitHammer 0.3s infinite alternate;
+}
+
+@keyframes hitHammer {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-10px) rotate(-15deg); }
+}
+
+@keyframes walk {
+    0% { transform: translateX(0) scaleX(1); }
+    100% { transform: translateX(50px) scaleX(1); }
+}
+
+/* محل ساختمان */
+.building-spot {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 3;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.building-spot.built {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+/* دایره کنترل */
+.control-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    position: relative;
+}
+
+.wheel-container {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* حلقه دایره */
+.wheel-ring {
+    width: 100%;
+    height: 100%;
+    border: 4px dashed #fff;
+    border-radius: 50%;
+    position: absolute;
+    transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* عکس آیکون‌ها */
+.wheel-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 50%;
+    padding: 2px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-60px) rotate(calc(-1 * var(--angle)));
+}
+
+/* شهردار */
+.mayor-img {
+    position: relative;
+    z-index: 10;
+    width: 70px;
+    height: auto;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* دکمه */
+button {
+    padding: 12px 24px;
+    background-color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #1a3a5c;
+    font-size: 16px;
+    box-shadow: 0 4px 0 #ccc;
+    transition: transform 0.1s, opacity 0.3s;
+}
+
+button:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #ccc;
+}
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
