@@ -22,17 +22,18 @@
             display: flex; justify-content: space-between; align-items: center; z-index: 10;
             color: white; font-weight: bold; font-size: 14px;
         }
-        .profile-info { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; display: flex; flex-direction: column; align-items: flex-start; }
+        .profile-info { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; }
         .profile-info .name { font-size: 14px; color: #f1c40f; }
         .profile-info .id { font-size: 11px; color: #ccc; }
         
         .coin-info { background: #f1c40f; color: #333; padding: 5px 15px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
 
-        .top-right-buttons { display: flex; gap: 10px; position: absolute; top: 10px; right: 15px; z-index: 10;}
-        .icon-btn { background: rgba(0,0,0,0.4); border: none; color: white; font-size: 20px; padding: 5px 10px; border-radius: 50%; cursor: pointer; }
+        /* دکمه‌های بالا سمت راست */
+        .top-right-buttons { display: flex; gap: 8px; position: absolute; top: 10px; right: 15px; z-index: 10;}
+        .icon-btn { background: rgba(0,0,0,0.4); border: none; color: white; font-size: 18px; padding: 5px 8px; border-radius: 50%; cursor: pointer; }
 
         /* صحنه بازی */
-        .scene { width: 100%; height: 60vh; position: relative; display: flex; justify-content: center; align-items: center; margin-top: 40px; }
+        .scene { width: 100%; height: 60vh; position: relative; display: flex; justify-content: center; align-items: center; margin-top: 40px; overflow: hidden; }
 
         /* زمین سه بعدی */
         .ground-container {
@@ -44,6 +45,34 @@
             border-radius: 10px;
             box-shadow: 0 15px 25px rgba(0,0,0,0.5);
             border: 4px solid #b89b58;
+            position: relative;
+        }
+
+        /* دیوار سنگی */
+        .stone-wall {
+            position: absolute;
+            border: 8px solid #777;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            display: none; /* ابتدا مخفی است */
+            z-index: 3;
+            pointer-events: none; /* کلیک از روش رد بشه */
+        }
+        .stone-wall.active {
+            display: block;
+            animation: wallAppear 0.5s ease-out;
+        }
+        /* افکت آجر چینی برای دیوار */
+        .stone-wall::before {
+            content: '';
+            position: absolute;
+            top: -8px; left: -8px; right: -8px; bottom: -8px;
+            border: 4px solid #555;
+            border-radius: 15px;
+        }
+        @keyframes wallAppear {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         /* شبکه ۳x۳ */
@@ -65,28 +94,33 @@
         /* محتویات خانه‌ها */
         .cell-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
         
-        /* تصویر چمن (پسوند jpeg) */
         .cell-content.grass-cell {
             background-image: url('grass.jpeg'); 
             background-size: cover; 
             background-position: center;
         }
 
-        /* ساختمان‌ها */
+        /* ساختمان‌های سه بعدی */
         .cell-content img.building-img { 
             width: 90%; height: 90%; object-fit: contain; 
-            filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5));
+            filter: drop-shadow(5px 15px 10px rgba(0,0,0,0.6));
+            transform: rotateX(10deg) translateY(-10px);
+            transform-origin: bottom center;
             mix-blend-mode: multiply;
+            transition: transform 0.3s ease;
+        }
+        .cell-content img.building-img:hover {
+            transform: rotateX(15deg) translateY(-15px) scale(1.05);
         }
 
-        /* شخصیت‌ها */
+        /* شخصیت‌ها (سرعت و محدوده) */
         .char-img { position: absolute; z-index: 5; mix-blend-mode: multiply; transition: all 0.1s linear; }
         .mayor { width: 50px; bottom: 10%; left: 50%; transform: translateX(-50%); }
         #builder1 { width: 40px; bottom: 10%; right: 35%; }
         #builder2 { width: 40px; bottom: 10%; right: 25%; }
 
         /* کنترل‌ها */
-        .controls { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .controls { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
 
         .joystick-container {
             width: 90px; height: 90px; position: relative; display: flex;
@@ -98,10 +132,10 @@
             position: absolute; transition: transform 0.1s ease-out;
         }
 
-        .action-btn-group { display: flex; gap: 10px; }
+        .action-btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; width: 150px; }
         .action-btn {
-            width: 60px; height: 60px; border-radius: 50%; background-color: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.6); color: white; font-size: 25px;
+            width: 55px; height: 55px; border-radius: 50%; background-color: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.6); color: white; font-size: 22px;
             display: flex; justify-content: center; align-items: center; cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
@@ -141,10 +175,10 @@
         .btn-reject { background-color: #f44336; }
         .btn-action { background-color: #2980b9; width: 100%; margin-top: 10px; }
 
-        .profile-form input, .friend-form input, .attack-form input {
+        .profile-form input, .friend-form input, .attack-form input, .rename-form input {
             width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; text-align: center;
         }
-        .profile-form button { width: 100%; padding: 10px; background: #1a3a5c; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .profile-form button, .rename-form button { width: 100%; padding: 10px; background: #1a3a5c; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
 
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -156,7 +190,7 @@
 </head>
 <body id="main-body">
     
-    <!-- پروفایل -->
+    <!-- پروفایل اولیه -->
     <div class="modal-overlay active" id="profile-modal">
         <div class="modal-content profile-form">
             <h2>خوش آمدید، شهردار!</h2>
@@ -167,20 +201,24 @@
 
     <div class="game-container">
         <div class="top-bar">
-            <div class="profile-info">
+            <div class="profile-info" id="profile-info">
                 <span class="name" id="display-name">شهردار</span>
                 <span class="id">ID: <span id="display-id">---</span></span>
             </div>
             <div class="coin-info">🪙 <span id="coin-count">۱۰۰</span></div>
         </div>
         
-        <div class="top-right-buttons" style="position: absolute; top: 10px; right: 15px; z-index: 10;">
+        <div class="top-right-buttons">
             <button class="icon-btn" id="friends-btn">👥</button>
             <button class="icon-btn" id="attack-btn">⚔️</button>
+            <button class="icon-btn" id="daily-btn">🎁</button>
         </div>
 
         <div class="scene" id="scene">
             <div class="ground-container" id="ground-container">
+                <!-- دیوار سنگی -->
+                <div class="stone-wall" id="stone-wall"></div>
+                <!-- شبکه ۳x۳ -->
                 <div class="grid-container" id="grid-container"></div>
             </div>
 
@@ -194,10 +232,20 @@
                 <div class="joystick-knob" id="joystick-knob"></div>
             </div>
             <div class="action-btn-group">
-                <button id="land-btn" class="action-btn">🌍</button>
-                <button id="grass-btn" class="action-btn">🌿</button>
-                <button id="hammer-btn" class="action-btn">🔨</button>
+                <button id="wall-btn" class="action-btn">🧱</button> <!-- دیوار -->
+                <button id="land-btn" class="action-btn">🌍</button> <!-- زمین -->
+                <button id="grass-btn" class="action-btn">🌿</button> <!-- چمن -->
+                <button id="hammer-btn" class="action-btn">🔨</button> <!-- ساخت -->
             </div>
+        </div>
+    </div>
+
+    <!-- مودال تغییر نام -->
+    <div class="modal-overlay" id="rename-modal">
+        <div class="modal-content rename-form">
+            <h2>تغییر نام شهردار</h2>
+            <input type="text" id="new-name-input" placeholder="نام جدید..." maxlength="15">
+            <button id="save-name-btn">ذخیره</button>
         </div>
     </div>
 
@@ -251,6 +299,8 @@
         let userProfile = localStorage.getItem('shahrdar_profile');
         let cityGrid = JSON.parse(localStorage.getItem('shahrdar_city')) || Array(9).fill(null);
         let landLevel = parseInt(localStorage.getItem('shahrdar_land')) || 1;
+        let hasWall = localStorage.getItem('shahrdar_wall') === 'true';
+        let lastDaily = localStorage.getItem('shahrdar_daily') || 0;
 
         if (!userId) {
             userId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -266,7 +316,12 @@
         const buildModal = document.getElementById('build-modal');
         const buildingGrid = document.getElementById('building-grid');
         const toast = document.getElementById('toast');
-        
+        const stoneWall = document.getElementById('stone-wall');
+        const profileInfo = document.getElementById('profile-info');
+        const renameModal = document.getElementById('rename-modal');
+        const newNameInput = document.getElementById('new-name-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
+
         function showToast(msg) {
             toast.innerText = msg;
             toast.classList.add('show');
@@ -278,15 +333,35 @@
             displayId.innerText = userId;
             coinCount.innerText = userCoins;
             if (userProfile) document.getElementById('profile-modal').classList.remove('active');
+            if (hasWall) stoneWall.classList.add('active');
+            else stoneWall.classList.remove('active');
         }
         updateUI();
 
+        // ================= پروفایل و تغییر نام =================
         document.getElementById('save-profile-btn').addEventListener('click', () => {
             const name = document.getElementById('username-input').value.trim();
             if (name === '') return alert('نام را وارد کنید!');
             userProfile = name;
             localStorage.setItem('shahrdar_profile', userProfile);
             updateUI();
+        });
+
+        profileInfo.addEventListener('click', () => {
+            if (userProfile) {
+                newNameInput.value = userProfile;
+                renameModal.classList.add('active');
+            }
+        });
+
+        saveNameBtn.addEventListener('click', () => {
+            const newName = newNameInput.value.trim();
+            if (newName === '') return alert('نام را وارد کنید!');
+            userProfile = newName;
+            localStorage.setItem('shahrdar_profile', userProfile);
+            updateUI();
+            renameModal.classList.remove('active');
+            showToast('نام با موفقیت تغییر کرد!');
         });
 
         // ================= زمین و شبکه =================
@@ -371,6 +446,34 @@
             showToast(`زمین بزرگتر شد! سطح ${landLevel}`);
         });
 
+        // دیوار سنگی
+        document.getElementById('wall-btn').addEventListener('click', () => {
+            if (hasWall) return showToast('شما قبلاً دیوار کشیده‌اید!');
+            if (userCoins < 50) return showToast('برای دیوار به ۵۰ سکه نیاز دارید!');
+            userCoins -= 50;
+            hasWall = true;
+            localStorage.setItem('shahrdar_coins', userCoins.toString());
+            localStorage.setItem('shahrdar_wall', 'true');
+            updateUI();
+            showToast('دیوار سنگی دور شهر کشیده شد! 🧱');
+        });
+
+        // جایزه روزانه
+        document.getElementById('daily-btn').addEventListener('click', () => {
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            if (now - lastDaily < oneDay) {
+                const hoursLeft = Math.ceil((oneDay - (now - lastDaily)) / (1000 * 60 * 60));
+                return showToast(`جایزه بعدی تا ${hoursLeft} ساعت دیگر!`);
+            }
+            userCoins += 10;
+            lastDaily = now;
+            localStorage.setItem('shahrdar_coins', userCoins.toString());
+            localStorage.setItem('shahrdar_daily', now.toString());
+            updateUI();
+            showToast('جایزه روزانه ۱۰ سکه دریافت شد! 🎁');
+        });
+
         // ثبت ساخت
         gridContainer.addEventListener('click', (e) => {
             const cell = e.target.closest('.grid-cell');
@@ -406,7 +509,7 @@
             }
         });
 
-        // ================= حمله و پادگان =================
+        // ================= حمله =================
         document.getElementById('attack-btn').addEventListener('click', () => {
             document.getElementById('attack-modal').classList.add('active');
         });
@@ -415,7 +518,6 @@
             const enemyId = document.getElementById('enemy-id-input').value.trim();
             if (!enemyId) return showToast('شناسه دشمن را وارد کنید!');
             
-            // چک کردن وجود پادگان در زمین
             let hasBase = cityGrid.some(cell => cell && cell.name === 'پادگان نظامی');
             if (!hasBase) return showToast('ابتدا باید یک پادگان نظامی بسازید!');
             
@@ -430,7 +532,7 @@
             document.getElementById('enemy-id-input').value = '';
         });
 
-        // ================= جوی‌استیک (سرعت زیاد) =================
+        // ================= جوی‌استیک (محدوده کامل) =================
         let mayorX = 50, mayorY = 10, isDragging = false;
         const mayor = document.getElementById('mayor-img');
         mayor.style.left = mayorX + '%';
@@ -459,11 +561,15 @@
             }
             document.getElementById('joystick-knob').style.transform = `translate(${deltaX}px, ${deltaY}px)`;
             
-            // افزایش سرعت شهردار: ضریب از 10 به 30 تغییر کرد
-            mayorX = 50 + (deltaX / maxRadius) * 30;
+            // محدوده کامل: از ۰ تا ۱۰۰ درصد
+            mayorX = 50 + (deltaX / maxRadius) * 50;
             mayorY = 10 - (deltaY / maxRadius) * 30;
-            if (mayorY < 0) mayorY = 0;
-            if (mayorY > 40) mayorY = 40; // اجازه حرکت تا بالای صفحه
+            
+            // محدودیت نهایی که از صفحه بیرون نزنه
+            if (mayorX < 5) mayorX = 5;
+            if (mayorX > 95) mayorX = 95;
+            if (mayorY < 5) mayorY = 5;
+            if (mayorY > 45) mayorY = 45;
             
             mayor.style.left = mayorX + '%';
             mayor.style.bottom = mayorY + '%';
