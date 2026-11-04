@@ -3,35 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شهردار - بازی</title>
+    <title>شهردار | بازی</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- صحنه اصلی (بالای صفحه) -->
-    <div class="scene">
-        <!-- سکو -->
-        <img src="platform.jpg" alt="سکو" class="platform-img">
+    <div class="game-container">
         
-        <!-- شخصیت‌ها (همه روی سکو) -->
-        <img src="citizen.jpg" alt="شهروند" class="char-img citizen">
-        <img src="builder.jpg" alt="سازنده ۱" class="char-img builder" id="builder1">
-        <img src="builder.jpg" alt="سازنده ۲" class="char-img builder" id="builder2">
-        <img src="mayor.jpg" alt="شهردار" class="char-img mayor" id="mayor-img">
-        
-        <!-- محل ساختمان ساخته شده -->
-        <div id="building-spot" class="building-spot"></div>
-    </div>
+        <!-- سکو و شخصیت‌ها -->
+        <div class="scene" id="scene">
+            <img src="platform.jpg" alt="سکو" class="platform-img">
+            
+            <!-- شهردار (وسط) -->
+            <img src="mayor.jpg" alt="شهردار" class="char-img mayor" id="mayor-img">
+            
+            <!-- شهروند (چپ) -->
+            <img src="citizen.jpg" alt="شهروند" class="char-img citizen" id="citizen">
+            
+            <!-- سازنده ۱ (راست) -->
+            <img src="builder.jpg" alt="سازنده" class="char-img builder" id="builder1">
+            <!-- سازنده ۲ (راست) -->
+            <img src="builder.jpg" alt="سازنده" class="char-img builder" id="builder2">
 
-    <!-- کنترل‌های پایین صفحه -->
-    <div class="controls">
-        <div class="control-left">
-            <button id="spin-btn" class="action-btn">چرخش</button>
+            <!-- محل ساختمان -->
+            <div id="building-spot" class="building-spot"></div>
         </div>
-        <div class="control-right">
-            <button class="action-btn secondary">ساخت</button>
-        </div>
-    </div>
 
+        <!-- کنترل‌های پایین -->
+        <div class="controls">
+            <!-- جوی‌استیک سمت چپ -->
+            <div class="joystick-container" id="joystick-container">
+                <div class="joystick-base"></div>
+                <div class="joystick-knob" id="joystick-knob"></div>
+            </div>
+            
+            <!-- دکمه ساخت سمت راست -->
+            <button id="build-btn" class="action-btn">ساخت</button>
+        </div>
+
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
