@@ -8,28 +8,18 @@
 body {
     background-color: #1a3a5c;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow: hidden;
-    /* برای اینکه صفحه کاملاً عمودی باشه */
-    flex-direction: column; 
-}
-
-.game-container {
-    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 400px; /* محدود کردن عرض برای موبایل */
-    padding: 10px;
+    justify-content: space-between;
+    min-height: 100vh;
+    overflow: hidden;
 }
 
-/* صحنه */
+/* --- صحنه اصلی --- */
 .scene {
-    width: 300px;
-    height: 250px;
+    width: 100%;
+    max-width: 400px;
+    height: 60vh; /* فضای بیشتر برای سکو */
     position: relative;
     display: flex;
     justify-content: center;
@@ -37,47 +27,54 @@ body {
     margin-top: 20px;
 }
 
-/* سکو (کج شده به صورت سه بعدی) */
+/* سکو (بزرگتر و واضح) */
 .platform-img {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 95%;
+    max-width: 350px;
+    height: auto;
     object-fit: contain;
     z-index: 1;
-    /* کج کردن سکو */
-    transform: perspective(600px) rotateX(45deg); 
+    /* کج کردن سکو برای حالت سه بعدی */
+    transform: perspective(800px) rotateX(45deg); 
 }
 
-/* استایل شخصیت‌ها */
+/* شخصیت‌ها (همه روی سکو) */
 .char-img {
     position: absolute;
-    width: 50px; 
     height: auto;
     z-index: 2;
     transition: all 0.3s ease;
-    /* قرار دادن شخصیت‌ها روی سطح کج */
-    transform-origin: bottom center;
 }
 
-/* شهروند (سمت چپ) */
+/* شهروند: سمت چپ */
 .citizen {
-    bottom: 30%; 
-    left: 15%;
-    width: 40px;
+    width: 30px; /* کوچیک شد */
+    bottom: 35%; /* اومد بالاتر روی سکو */
+    left: 20%;
     animation: walk 4s infinite alternate ease-in-out;
 }
 
-/* سازنده‌ها (وسط و راست) */
+/* سازنده‌ها: وسط، کنار هم */
 #builder1 {
-    bottom: 25%;
-    left: 35%;
-    width: 45px;
+    width: 35px; /* کوچیک شد */
+    bottom: 35%;
+    left: 40%;
 }
 
 #builder2 {
-    bottom: 25%;
-    right: 35%;
-    width: 45px;
+    width: 35px;
+    bottom: 35%;
+    right: 40%;
+}
+
+/* شهردار: وسط و بالاتر */
+.mayor {
+    width: 40px; /* کوچیک شد */
+    bottom: 45%; /* بالاتر از بقیه */
+    left: 50%;
+    transform: translateX(-50%); /* دقیقاً وسط */
+    z-index: 5;
 }
 
 /* انیمیشن چکش زدن */
@@ -87,109 +84,64 @@ body {
 
 @keyframes hitHammer {
     0% { transform: translateY(0) rotate(0deg); }
-    100% { transform: translateY(-10px) rotate(-15deg); }
+    100% { transform: translateY(-8px) rotate(-15deg); }
 }
 
-@keyframes walk {
-    0% { transform: translateX(0) scaleX(1); }
-    100% { transform: translateX(50px) scaleX(1); }
-}
-
-/* محل ساختمان */
+/* محل ساختمان (وسط سکو) */
 .building-spot {
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
     position: absolute;
-    top: 40%;
+    bottom: 40%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0);
+    transform: translate(-50%, 50%) scale(0);
     z-index: 3;
     transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
     opacity: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .building-spot.built {
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, 50%) scale(1);
     opacity: 1;
 }
 
-/* دایره کنترل */
-.control-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin-top: 20px;
-    position: relative;
-}
-
-.wheel-container {
-    width: 140px;
-    height: 140px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* حلقه دایره */
-.wheel-ring {
+/* --- کنترل‌ها --- */
+.controls {
     width: 100%;
-    height: 100%;
-    border: 4px dashed #fff;
-    border-radius: 50%;
-    position: absolute;
-    transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    max-width: 500px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    margin-bottom: 40px;
 }
 
-/* عکس آیکون‌ها */
-.wheel-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 50%;
-    padding: 2px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-60px) rotate(calc(-1 * var(--angle)));
-}
-
-/* شهردار */
-.mayor-img {
-    position: relative;
-    z-index: 10;
+.action-btn {
     width: 70px;
-    height: auto;
+    height: 70px;
     border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-/* دکمه */
-button {
-    padding: 12px 24px;
-    background-color: #fff;
-    border: none;
-    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    color: white;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
-    color: #1a3a5c;
-    font-size: 16px;
-    box-shadow: 0 4px 0 #ccc;
-    transition: transform 0.1s, opacity 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.1s;
 }
 
-button:active {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 #ccc;
+.action-btn:active {
+    transform: scale(0.95);
+    background-color: rgba(255, 255, 255, 0.4);
 }
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+
+.control-right .action-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 13px;
+}
+
+@keyframes walk {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(30px); }
 }
