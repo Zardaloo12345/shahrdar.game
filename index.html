@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شهردار | بازی</title>
+    <title>شهردار | بازی مدیریت شهر</title>
     <style>
         /* ================= استایل‌ها ================= */
         * {
@@ -32,6 +32,7 @@
             flex-direction: column;
             justify-content: space-between;
             padding-bottom: 20px;
+            position: relative;
         }
 
         /* --- صحنه بازی --- */
@@ -53,18 +54,27 @@
             z-index: 1;
         }
 
+        /* حذف دور سفید عکس‌ها با میکس بلند */
         .char-img {
             position: absolute;
             z-index: 2;
             transition: all 0.2s ease;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+            mix-blend-mode: multiply; /* این خط دور سفید عکس‌ها رو حذف می‌کنه */
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
         }
 
+        /* مخفی کردن شهروند در ابتدا */
         .citizen {
             width: 35px;
             bottom: 40%;
             left: 20%;
+            display: none; /* ابتدا مخفی است */
         }
+        /* کلاس برای نمایش شهروند */
+        .citizen.show {
+            display: block;
+        }
+
         #builder1 {
             width: 40px;
             bottom: 40%;
@@ -113,6 +123,7 @@
             transition: transform 0.1s ease-out;
         }
 
+        /* استایل دکمه چکش */
         .action-btn {
             width: 70px;
             height: 70px;
@@ -120,15 +131,110 @@
             background-color: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.6);
             color: white;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .action-btn:active {
             background-color: rgba(255,255,255,0.4);
             transform: scale(0.95);
         }
+
+        /* --- اینباکس و نامه --- */
+        .inbox-icon {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 10;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* مودال‌ها (پنجره‌های شناور) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            color: #333;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .building-item {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #f0f0f0;
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .building-item:hover {
+            border-color: #1a3a5c;
+            background: #e0e0e0;
+        }
+        .building-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* استایل دکمه‌های رد و قبول */
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+        .btn-accept { background-color: #4CAF50; }
+        .btn-reject { background-color: #f44336; }
 
         /* محل ساخت */
         .building-spot {
@@ -156,6 +262,9 @@
 <body>
     <div class="game-container">
         
+        <!-- آیکون اینباکس -->
+        <div class="inbox-icon" id="inbox-icon">✉️</div>
+
         <!-- سکو و شخصیت‌ها -->
         <div class="scene" id="scene">
             <img src="platform.jpg" alt="سکو" class="platform-img">
@@ -173,9 +282,32 @@
             <div class="joystick-container" id="joystick-container">
                 <div class="joystick-knob" id="joystick-knob"></div>
             </div>
-            <button id="build-btn" class="action-btn">ساخت</button>
+            <!-- دکمه چکش (سمت چپ - همون پایین راست چون RTL هستیم) -->
+            <button id="hammer-btn" class="action-btn">🔨</button>
         </div>
 
+    </div>
+
+    <!-- مودال انتخاب ساختمان (چکش) -->
+    <div class="modal-overlay" id="build-modal">
+        <div class="modal-content">
+            <h2>چه ساختمانی بسازیم؟</h2>
+            <div class="building-grid" id="building-grid">
+                <!-- ۲۰ آیتم به صورت جاوااسکریپت پر می‌شود -->
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال درخواست شهروند (اینباکس) -->
+    <div class="modal-overlay" id="inbox-modal">
+        <div class="modal-content">
+            <h2>درخواست شهروند</h2>
+            <p>شهروند عادی می‌خواهد وارد شهر شود. آیا اجازه می‌دهید؟</p>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-reject" id="reject-btn">رد (نه)</button>
+                <button class="modal-btn btn-accept" id="accept-btn">قبول (بله)</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -184,79 +316,79 @@
         const joystickContainer = document.getElementById('joystick-container');
         const joystickKnob = document.getElementById('joystick-knob');
         const mayor = document.getElementById('mayor-img');
-        const buildBtn = document.getElementById('build-btn');
+        const citizen = document.getElementById('citizen');
+        const hammerBtn = document.getElementById('hammer-btn');
         const buildingSpot = document.getElementById('building-spot');
         const builder1 = document.getElementById('builder1');
         const builder2 = document.getElementById('builder2');
 
-        // مختصات اولیه شهردار
-        let mayorX = 50; 
-        let mayorY = 45; 
-        const maxMoveX = 15;
-        const maxMoveY = 15;
+        // المان‌های مودال
+        const buildModal = document.getElementById('build-modal');
+        const buildingGrid = document.getElementById('building-grid');
+        const inboxIcon = document.getElementById('inbox-icon');
+        const inboxModal = document.getElementById('inbox-modal');
+        const acceptBtn = document.getElementById('accept-btn');
+        const rejectBtn = document.getElementById('reject-btn');
+
+        // آرایه ۲۰ ساختمان (فعلاً با ۴ عکس تکرار شده)
+        const buildings = [
+            'icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg',
+            'icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg',
+            'icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg',
+            'icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg',
+            'icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg'
+        ];
 
         // --- منطق جوی‌استیک ---
+        let mayorX = 50, mayorY = 45;
+        const maxMoveX = 15, maxMoveY = 15;
         let isDragging = false;
 
-        joystickContainer.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            moveKnob(e);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) moveKnob(e);
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            joystickKnob.style.transform = 'translate(0, 0)';
-        });
-
-        // لمس در موبایل
-        joystickContainer.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            moveKnob(e.touches[0]);
-            e.preventDefault();
-        });
+        joystickContainer.addEventListener('mousedown', (e) => { isDragging = true; moveKnob(e); });
+        document.addEventListener('mousemove', (e) => { if (isDragging) moveKnob(e); });
+        document.addEventListener('mouseup', () => { isDragging = false; joystickKnob.style.transform = 'translate(0, 0)'; });
         
-        document.addEventListener('touchmove', (e) => {
-            if (isDragging) moveKnob(e.touches[0]);
-        });
-        
-        document.addEventListener('touchend', () => {
-            isDragging = false;
-            joystickKnob.style.transform = 'translate(0, 0)';
-        });
+        joystickContainer.addEventListener('touchstart', (e) => { isDragging = true; moveKnob(e.touches[0]); e.preventDefault(); });
+        document.addEventListener('touchmove', (e) => { if (isDragging) moveKnob(e.touches[0]); });
+        document.addEventListener('touchend', () => { isDragging = false; joystickKnob.style.transform = 'translate(0, 0)'; });
 
         function moveKnob(event) {
             const rect = joystickContainer.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-
             let deltaX = event.clientX - centerX;
             let deltaY = event.clientY - centerY;
-
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             const maxRadius = 30;
-
             if (distance > maxRadius) {
                 deltaX = (deltaX / distance) * maxRadius;
                 deltaY = (deltaY / distance) * maxRadius;
             }
-
             joystickKnob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-            // حرکت شهردار
             mayorX = 50 + (deltaX / maxRadius) * maxMoveX;
-            mayorY = 45 - (deltaY / maxRadius) * maxMoveY; // Y در CSS برعکس است
-
+            mayorY = 45 - (deltaY / maxRadius) * maxMoveY;
             mayor.style.left = mayorX + '%';
             mayor.style.bottom = mayorY + '%';
         }
 
-        // --- دکمه ساخت ---
-        buildBtn.addEventListener('click', () => {
-            // انیمیشن چکش زدن
+        // --- دکمه چکش و باز کردن لیست ساختمان‌ها ---
+        hammerBtn.addEventListener('click', () => {
+            // پر کردن لیست ۲۰ تایی
+            buildingGrid.innerHTML = '';
+            buildings.forEach((imgSrc, index) => {
+                const div = document.createElement('div');
+                div.className = 'building-item';
+                div.innerHTML = `<img src="${imgSrc}" alt="ساختمان ${index+1}">`;
+                div.onclick = () => selectBuilding(imgSrc);
+                buildingGrid.appendChild(div);
+            });
+            buildModal.classList.add('active');
+        });
+
+        function selectBuilding(imgSrc) {
+            buildModal.classList.remove('active');
+            
+            // انیمیشن چکش زدن سازنده‌ها
             builder1.style.transform = 'rotate(-20deg) translateY(-10px)';
             builder2.style.transform = 'rotate(-20deg) translateY(-10px)';
             
@@ -265,13 +397,28 @@
                 builder2.style.transform = 'rotate(0) translateY(0)';
             }, 300);
 
-            // آیکون تصادفی
-            const icons = ['icon-water.jpg', 'icon-fire.jpg', 'icon-education.jpg', 'icon-hospital.jpg'];
-            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-            
-            buildingSpot.innerHTML = `<img src="${randomIcon}" alt="ساختمان">`;
+            // ساخت ساختمان
+            buildingSpot.innerHTML = `<img src="${imgSrc}" alt="ساختمان">`;
             buildingSpot.classList.add('built');
+        }
+
+        // --- منطق اینباکس و درخواست شهروند ---
+        inboxIcon.addEventListener('click', () => {
+            inboxModal.classList.add('active');
         });
+
+        acceptBtn.addEventListener('click', () => {
+            inboxModal.classList.remove('active');
+            citizen.classList.add('show'); // شهروند نمایش داده میشه
+            alert("شهروند وارد شهر شد! 🎉");
+        });
+
+        rejectBtn.addEventListener('click', () => {
+            inboxModal.classList.remove('active');
+            citizen.classList.remove('show'); // شهروند مخفی میشه
+            alert("شما درخواست را رد کردید. شهروند رفت. ❌");
+        });
+
     </script>
 </body>
 </html>
