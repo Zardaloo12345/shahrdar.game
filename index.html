@@ -36,19 +36,21 @@
         .game-container {
             width: 100%; height: 100%; display: flex;
             flex-direction: column; justify-content: space-between; padding: 10px; position: relative;
+            overflow: hidden; /* مخفی کردن بخش‌های بیرون از صفحه */
         }
 
-        /* نوار بالای صفحه (مثل عکس) */
+        /* نوار بالای صفحه */
         .top-bar {
             position: absolute; top: 10px; left: 15px; right: 15px;
-            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center; z-index: 20;
             color: white; font-weight: bold; font-size: 14px;
             pointer-events: none;
         }
         
-        .profile-info, .coin-info, .citizen-info, .level-info-top { 
-            background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; 
+        .profile-info, .coin-info, .citizen-info { 
+            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px; 
             display: flex; align-items: center; gap: 5px; pointer-events: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         .profile-info { cursor: pointer; flex-direction: column; align-items: flex-start; }
         .profile-info .name { font-size: 14px; color: #f1c40f; }
@@ -61,40 +63,48 @@
         /* سیستم لول‌آپ (XP) */
         .level-container {
             position: absolute; top: 55px; left: 50%; transform: translateX(-50%);
-            width: 250px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 10px;
-            text-align: center; color: white; z-index: 10;
+            width: 250px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px;
+            text-align: center; color: white; z-index: 20;
         }
         .level-info { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
         .xp-bar-bg { width: 100%; height: 8px; background: #555; border-radius: 4px; overflow: hidden; }
         .xp-bar-fill { width: 0%; height: 100%; background: #4CAF50; transition: width 0.3s; }
 
         /* دکمه‌های بالا سمت راست */
-        .top-right-buttons { display: flex; gap: 8px; position: absolute; top: 10px; right: 15px; z-index: 10; pointer-events: auto;}
-        .icon-btn { background: rgba(0,0,0,0.5); border: none; color: white; font-size: 18px; padding: 5px 8px; border-radius: 50%; cursor: pointer; position: relative; }
+        .top-right-buttons { display: flex; gap: 8px; position: absolute; top: 10px; right: 15px; z-index: 20; pointer-events: auto;}
+        .icon-btn { background: rgba(0,0,0,0.6); border: none; color: white; font-size: 18px; padding: 5px 8px; border-radius: 50%; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
         .badge { position: absolute; top: -2px; right: -2px; background: #e74c3c; color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; border: 2px solid #1a3a5c; animation: pulse 1s infinite; }
         .badge.show { display: flex; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
-        /* نوار ابزار سمت چپ (مثل عکس) */
-        .tool-bar { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10; }
-        .action-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.5); border: 2px solid #fff; color: white; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        /* نوار ابزار سمت چپ */
+        .tool-bar { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 20; }
+        .action-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.6); border: 2px solid #fff; color: white; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
         .action-btn:active { transform: scale(0.9); }
 
-        /* ================= صحنه بازی ایزومتریک ================= */
+        /* ================= صحنه بازی (قابل اسکرول) ================= */
+        .scene-wrapper {
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+            overflow: auto; /* فعال کردن اسکرول افقی و عمودی */
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1;
+        }
+        
         .scene { 
-            width: 100%; height: 100%; 
-            position: relative; display: flex; justify-content: center; align-items: center; 
-            overflow: hidden; 
-            perspective: 1200px;
+            /* سایز بزرگ‌تر از صفحه برای ایجاد اسکرول */
+            width: 2500px; height: 1800px; 
+            position: relative; 
+            display: flex; justify-content: center; align-items: center; 
+            perspective: 1500px;
+            flex-shrink: 0;
         }
 
-        /* زمین کاشی‌کاری شده (مثل عکس) */
+        /* زمین کاشی‌کاری شده ایزومتریک */
         .ground-container {
             position: absolute; 
-            width: 80%; max-width: 900px; 
-            height: 80%;
+            width: 1800px; height: 1400px; 
             top: 50%; left: 50%; 
-            /* زاویه ایزومتریک دقیق */
             transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg);
             transition: transform 0.3s ease-out;
             z-index: 1; 
@@ -105,77 +115,74 @@
             background-image: 
                 linear-gradient(45deg, #8ebf56 25%, transparent 25%, transparent 75%, #8ebf56 75%, #8ebf56),
                 linear-gradient(45deg, #8ebf56 25%, transparent 25%, transparent 75%, #8ebf56 75%, #8ebf56);
-            background-size: 80px 80px;
-            background-position: 0 0, 40px 40px;
-            border: 4px solid #6b9c3b;
-            border-radius: 10px;
-            box-shadow: 0 30px 50px rgba(0,0,0,0.5);
+            background-size: 120px 120px;
+            background-position: 0 0, 60px 60px;
+            border: 8px solid #6b9c3b;
+            border-radius: 15px;
+            box-shadow: 0 40px 60px rgba(0,0,0,0.6);
         }
 
         /* دیوار */
-        .stone-wall { position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px; border: 15px solid #555; border-radius: 15px; box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.6); display: none; z-index: 3; pointer-events: none; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px); }
+        .stone-wall { position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; border: 20px solid #555; border-radius: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 15px 25px rgba(0,0,0,0.6); display: none; z-index: 3; pointer-events: none; background: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); }
         .stone-wall.active { display: block; animation: wallAppear 0.5s ease-out; }
         @keyframes wallAppear { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* شبکه ۱۰۰۰ خانه */
+        /* شبکه ۴۰x۲۵ خانه */
         .grid-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: grid; grid-template-columns: repeat(40, 1fr); grid-template-rows: repeat(25, 1fr); z-index: 2; pointer-events: none; gap: 1px; padding: 2px; transform-style: preserve-3d; }
         .grid-container.active { pointer-events: all; }
         .grid-cell { border: 1px solid rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.1s; position: relative; font-size: 8px; }
-        .grid-cell:hover { background: rgba(255,255,255,0.3); }
-        .grid-cell.selected { background: rgba(76, 175, 80, 0.8); border: 1px solid #4CAF50; }
+        .grid-cell:hover { background: rgba(255,255,255,0.4); }
+        .grid-cell.selected { background: rgba(76, 175, 80, 0.8); border: 2px solid #4CAF50; }
 
         /* محتویات خانه‌ها */
         .cell-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
         .cell-content.grass-cell { background-image: url('grass.jpg'); background-size: cover; background-position: center; }
         .cell-content.street-cell { background-color: #333; }
-        .cell-content.shop-cell { background-color: #fff3e0; border: 1px solid #ff9800; font-size: 10px; display: flex; justify-content: center; align-items: center; }
+        .cell-content.shop-cell { background-color: #fff3e0; border: 1px solid #ff9800; font-size: 15px; display: flex; justify-content: center; align-items: center; }
 
-        /* ساختمان‌ها (مچ شده با زمین) */
+        /* ساختمان‌ها (بزرگ و مچ شده) */
         .cell-content img.building-img { 
-            width: 100%; height: 100%; object-fit: contain; 
-            transform: translateZ(0); /* بدون چرخش اضافی */
+            width: 150%; /* بزرگتر از خانه برای دیده شدن */
+            height: 150%; 
+            object-fit: contain; 
+            transform: translateZ(0); 
             transform-origin: bottom center;
             mix-blend-mode: multiply;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.4));
         }
 
-        /* ================= کاراکترها (با انیمیشن راه رفتن) ================= */
-        /* کاراکترها باید از زمین بلند بشن تا روی سطح ایزومتریک دیده بشن */
+        /* ================= کاراکترها (کوچک‌تر و خودکار) ================= */
         .char-img, .citizen { 
             position: absolute; 
             z-index: 5; 
             mix-blend-mode: multiply; 
             pointer-events: none;
-            /* ارتفاع از زمین */
-            transform: translateZ(20px);
-            filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5));
+            transform: translateZ(15px);
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
         }
 
-        .mayor { width: 35px; bottom: 5%; left: 50%; transform: translateX(-50%) translateZ(20px); }
-        #builder1 { width: 30px; bottom: 5%; right: 35%; transform: translateZ(20px); }
-        #builder2 { width: 30px; bottom: 5%; right: 25%; transform: translateZ(20px); }
+        /* شهردار (خودکار) */
+        .mayor { width: 30px; }
+        
+        /* سازنده‌ها */
+        #builder1 { width: 20px; bottom: 5%; right: 35%; transform: translateZ(15px); }
+        #builder2 { width: 20px; bottom: 5%; right: 25%; transform: translateZ(15px); }
 
-        /* شهروندان (حرکت در خط) */
+        /* شهروندان (کوچک) */
         .citizen { 
-            width: 30px; 
+            width: 18px; /* کوچک شده */
             height: auto; 
-            /* انیمیشن جابه‌جایی */
             transition: left 4s linear, bottom 1s ease-in-out; 
         }
 
-        /* انیمیشن پا زدن (بالا و پایین پریدن ملایم) */
+        /* انیمیشن پا زدن */
         @keyframes walkBob {
-            0%, 100% { transform: translateZ(20px) translateY(0); }
-            50% { transform: translateZ(20px) translateY(-3px); }
+            0%, 100% { transform: translateZ(15px) translateY(0); }
+            50% { transform: translateZ(15px) translateY(-3px); }
         }
-        .citizen.walking {
-            animation: walkBob 0.5s infinite alternate ease-in-out;
+        .citizen.walking, .mayor.walking {
+            animation: walkBob 0.4s infinite alternate ease-in-out;
         }
-
-        /* کنترل‌ها (جوی‌استیک) */
-        .controls { position: absolute; bottom: 20px; right: 20px; z-index: 10; }
-        .joystick-container { width: 90px; height: 90px; position: relative; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); }
-        .joystick-knob { width: 35px; height: 35px; background: rgba(255,255,255,0.7); border-radius: 50%; position: absolute; transition: transform 0.1s ease-out; }
 
         /* پنل تعامل */
         .interaction-panel { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; z-index: 50; transition: transform 0.3s ease; display: flex; flex-direction: column; gap: 10px; }
@@ -268,21 +275,20 @@
             <button id="hammer-btn" class="action-btn">🔨</button>
         </div>
 
-        <div class="scene" id="scene">
-            <div class="ground-container" id="ground-container">
-                <div class="stone-wall" id="stone-wall"></div>
-                <div class="grid-container" id="grid-container"></div>
-                <div id="citizens-layer"></div>
-            </div>
-
-            <img src="mayor.jpg" alt="شهردار" class="char-img mayor" id="mayor-img">
-            <img src="builder.jpg" alt="سازنده ۱" class="char-img" id="builder1">
-            <img src="builder.jpg" alt="سازنده ۲" class="char-img" id="builder2">
-        </div>
-
-        <div class="controls">
-            <div class="joystick-container" id="joystick-container">
-                <div class="joystick-knob" id="joystick-knob"></div>
+        <!-- بخش اسکرول‌شونده (صحنه بزرگ) -->
+        <div class="scene-wrapper" id="scene-wrapper">
+            <div class="scene" id="scene">
+                <div class="ground-container" id="ground-container">
+                    <div class="stone-wall" id="stone-wall"></div>
+                    <div class="grid-container" id="grid-container"></div>
+                    <div id="citizens-layer"></div>
+                </div>
+                
+                <!-- شهردار (خودکار) -->
+                <img src="mayor.jpg" alt="شهردار" class="char-img mayor walking" id="mayor-img">
+                
+                <img src="builder.jpg" alt="سازنده ۱" class="char-img" id="builder1">
+                <img src="builder.jpg" alt="سازنده ۲" class="char-img" id="builder2">
             </div>
         </div>
     </div>
@@ -317,7 +323,7 @@
 
     <div class="modal-overlay" id="build-modal">
         <div class="modal-content">
-            <h2>چه ساختمانی بسازیم؟ (۲۵ گزینه)</h2>
+            <h2>چه ساختمانی بسازیم؟</h2>
             <div class="building-grid" id="building-grid"></div>
         </div>
     </div>
@@ -359,6 +365,7 @@
                         loadingScreen.classList.add('hidden');
                         startCitizens();
                         startLetterSystem();
+                        startMayorWalking(); // شروع حرکت خودکار شهردار
                     }, 500);
                 }
             }, 150);
@@ -501,7 +508,34 @@
             updateUI();
         }
 
-        // ================= شهروندان (با انیمیشن راه رفتن) =================
+        // ================= حرکت خودکار شهردار =================
+        function startMayorWalking() {
+            const mayor = document.getElementById('mayor-img');
+            let mayorX = 50; // شروع از وسط
+            let direction = 1; // 1 برای راست، -1 برای چپ
+
+            setInterval(() => {
+                // حرکت تصادفی
+                mayorX += direction * (Math.random() * 0.5); // سرعت کم
+                
+                // اگر به لبه‌ها رسید، برگردد
+                if (mayorX > 80) {
+                    mayorX = 80;
+                    direction = -1;
+                    mayor.style.transform = 'scaleX(-1) translateZ(15px)'; // چرخش به چپ
+                } else if (mayorX < 20) {
+                    mayorX = 20;
+                    direction = 1;
+                    mayor.style.transform = 'scaleX(1) translateZ(15px)'; // چرخش به راست
+                }
+                
+                // تنظیم موقعیت
+                mayor.style.left = mayorX + '%';
+                mayor.style.bottom = '10%'; // ارتفاع ثابت
+            }, 100);
+        }
+
+        // ================= شهروندان =================
         let citizens = [];
         const CITIZEN_COUNT = 5;
 
@@ -518,7 +552,7 @@
         function createCitizen(index) {
             const randomImg = CITIZEN_IMAGES[Math.floor(Math.random() * CITIZEN_IMAGES.length)];
             const el = document.createElement('img');
-            el.className = 'citizen walking'; // اضافه کردن کلاس انیمیشن راه رفتن
+            el.className = 'citizen walking';
             el.src = randomImg;
             el.alt = 'citizen';
             
@@ -528,7 +562,7 @@
             el.style.left = startX + '%';
             el.style.bottom = lineY + '%';
             citizensLayer.appendChild(el);
-            citizens.push({ el: el, direction: 1, speed: 0.5 + Math.random() * 0.5 }); // سرعت کم برای راه رفتن
+            citizens.push({ el: el, direction: 1, speed: 0.5 + Math.random() * 0.5 });
             
             moveCitizenInLine(el, index);
         }
@@ -547,11 +581,11 @@
                 if (currentLeft > 90) {
                     currentLeft = 90;
                     citizenData.direction = -1;
-                    el.style.transform = 'scaleX(1) translateZ(20px)'; 
+                    el.style.transform = 'scaleX(1) translateZ(15px)'; 
                 } else if (currentLeft < 5) {
                     currentLeft = 5;
                     citizenData.direction = 1;
-                    el.style.transform = 'scaleX(-1) translateZ(20px)';
+                    el.style.transform = 'scaleX(-1) translateZ(15px)';
                 }
                 
                 el.style.left = currentLeft + '%';
@@ -866,46 +900,6 @@
         closePanelBtn.addEventListener('click', () => {
             intPanel.classList.remove('active');
         });
-
-        let mayorX = 50, mayorY = 10, isDragging = false;
-        const mayor = document.getElementById('mayor-img');
-        mayor.style.left = mayorX + '%';
-        mayor.style.bottom = mayorY + '%';
-
-        document.getElementById('joystick-container').addEventListener('mousedown', (e) => { isDragging = true; moveKnob(e); });
-        document.addEventListener('mousemove', (e) => { if (isDragging) moveKnob(e); });
-        document.addEventListener('mouseup', () => { isDragging = false; document.getElementById('joystick-knob').style.transform = 'translate(0, 0)'; });
-        
-        document.getElementById('joystick-container').addEventListener('touchstart', (e) => { isDragging = true; moveKnob(e.touches[0]); e.preventDefault(); });
-        document.addEventListener('touchmove', (e) => { if (isDragging) moveKnob(e.touches[0]); });
-        document.addEventListener('touchend', () => { isDragging = false; document.getElementById('joystick-knob').style.transform = 'translate(0, 0)'; });
-
-        function moveKnob(event) {
-            const container = document.getElementById('joystick-container');
-            const rect = container.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            let deltaX = event.clientX - centerX;
-            let deltaY = event.clientY - centerY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const maxRadius = 30;
-            if (distance > maxRadius) {
-                deltaX = (deltaX / distance) * maxRadius;
-                deltaY = (deltaY / distance) * maxRadius;
-            }
-            document.getElementById('joystick-knob').style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            
-            mayorX = 50 + (deltaX / maxRadius) * 30;
-            mayorY = 10 - (deltaY / maxRadius) * 15;
-            
-            if (mayorX < 20) mayorX = 20;
-            if (mayorX > 80) mayorX = 80;
-            if (mayorY < 5) mayorY = 5;
-            if (mayorY > 25) mayorY = 25;
-            
-            mayor.style.left = mayorX + '%';
-            mayor.style.bottom = mayorY + '%';
-        }
     </script>
 </body>
-                                                                                       </html>
+        </html>
