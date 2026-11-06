@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
     <title>شهردار | شهر صلح</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
         
-        /* پس‌زمینه مچ شده با کل صفحه */
+        /* ================= استایل کلی صفحه (زمین به عنوان پس‌زمینه) ================= */
         body {
-            background-image: url('background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            /* استفاده از الگوی شطرنجی به عنوان پس‌زمینه اصلی */
+            background-color: #8ebf56;
+            background-image: 
+                linear-gradient(45deg, #a4d16b 25%, transparent 25%, transparent 75%, #a4d16b 75%, #a4d16b),
+                linear-gradient(45deg, #a4d16b 25%, transparent 25%, transparent 75%, #a4d16b 75%, #a4d16b);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
             display: flex; justify-content: center; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden; 
         }
@@ -42,21 +45,20 @@
         /* نوار بالای صفحه */
         .top-bar {
             position: absolute; top: 10px; left: 15px; right: 15px;
-            display: flex; justify-content: space-between; align-items: center; z-index: 20;
+            display: flex; justify-content: space-between; align-items: flex-start; z-index: 20;
             color: white; font-weight: bold; font-size: 14px;
             pointer-events: none;
         }
         
-        .profile-info, .coin-info, .citizen-info { 
-            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px; 
+        .profile-info, .coin-info { 
+            background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 20px; 
             display: flex; align-items: center; gap: 5px; pointer-events: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); backdrop-filter: blur(5px);
         }
         .profile-info { cursor: pointer; flex-direction: column; align-items: flex-start; position: relative; }
         .profile-info .name { font-size: 14px; color: #f1c40f; }
         .profile-info .id { font-size: 11px; color: #ccc; }
         
-        /* دکمه حذف حساب (داخل پروفایل) */
         .delete-account-btn {
             position: absolute; top: -5px; right: -35px;
             background: #c0392b; color: white; border: none; border-radius: 50%;
@@ -66,28 +68,53 @@
 
         .stats-info { display: flex; gap: 8px; }
         .coin-info { background: #f1c40f; color: #333; }
-        .citizen-info { background: #e0e0e0; color: #333; }
 
-        /* سیستم لول‌آپ (XP) */
-        .level-container {
-            position: absolute; top: 55px; left: 50%; transform: translateX(-50%);
-            width: 250px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px;
-            text-align: center; color: white; z-index: 20;
+        /* ================= دایره پیشرفت (Level Ring) ================= */
+        .level-ring-container {
+            position: absolute; top: 15px; right: 15px; 
+            width: 70px; height: 70px;
+            z-index: 20;
+            pointer-events: none;
         }
-        .level-info { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
-        .xp-bar-bg { width: 100%; height: 8px; background: #555; border-radius: 4px; overflow: hidden; }
-        .xp-bar-fill { width: 0%; height: 100%; background: #4CAF50; transition: width 0.3s; }
 
-        /* دکمه‌های بالا سمت راست */
-        .top-right-buttons { display: flex; gap: 8px; position: absolute; top: 10px; right: 15px; z-index: 20; pointer-events: auto;}
-        .icon-btn { background: rgba(0,0,0,0.6); border: none; color: white; font-size: 18px; padding: 5px 8px; border-radius: 50%; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
+        .level-ring {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#4CAF50 0%, #555 0%); /* درصد پیشرفت اینجا اعمال میشه */
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        /* دایره داخلی (برای اینکه حلقه به نظر برسه) */
+        .level-ring::before {
+            content: '';
+            position: absolute;
+            width: 80%; height: 80%;
+            background: rgba(0,0,0,0.85);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .level-text {
+            position: relative; z-index: 2;
+            color: white; font-weight: bold; font-size: 18px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            text-align: center; line-height: 1;
+        }
+        .level-text span { display: block; font-size: 10px; color: #aaa; margin-top: 2px;}
+
+        /* دکمه‌های بالا سمت راست (زیر دایره) */
+        .top-right-buttons { display: flex; gap: 8px; position: absolute; top: 90px; right: 15px; z-index: 20; pointer-events: auto;}
+        .icon-btn { background: rgba(0,0,0,0.6); border: none; color: white; font-size: 18px; padding: 8px 10px; border-radius: 50%; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); backdrop-filter: blur(5px);}
         .badge { position: absolute; top: -2px; right: -2px; background: #e74c3c; color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; border: 2px solid #1a3a5c; animation: pulse 1s infinite; }
         .badge.show { display: flex; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
         /* نوار ابزار سمت چپ */
         .tool-bar { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 20; }
-        .action-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.6); border: 2px solid #fff; color: white; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+        .action-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.6); border: 2px solid #fff; color: white; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
         .action-btn:active { transform: scale(0.9); }
 
         /* ================= صحنه بازی (قابل اسکرول) ================= */
@@ -107,7 +134,7 @@
             flex-shrink: 0;
         }
 
-        /* زمین کاشی‌کاری شده ایزومتریک */
+        /* ظرف زمین اصلی (بدون پس‌زمینه اضافی) */
         .ground-container {
             position: absolute; 
             width: 1000px; height: 800px; 
@@ -117,15 +144,11 @@
             z-index: 1; 
             transform-style: preserve-3d;
             
-            background-color: #a4d16b;
-            background-image: 
-                linear-gradient(45deg, #8ebf56 25%, transparent 25%, transparent 75%, #8ebf56 75%, #8ebf56),
-                linear-gradient(45deg, #8ebf56 25%, transparent 25%, transparent 75%, #8ebf56 75%, #8ebf56);
-            background-size: 80px 80px;
-            background-position: 0 0, 40px 40px;
-            border: 8px solid #6b9c3b;
+            /* خود زمین الگوی شطرنجی داره */
+            background-color: transparent;
+            border: 4px solid rgba(0,0,0,0.2);
             border-radius: 15px;
-            box-shadow: 0 40px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 40px 60px rgba(0,0,0,0.3);
         }
 
         /* دیوار */
@@ -137,14 +160,13 @@
         .grid-container { 
             position: absolute; width: 100%; height: 100%; top: 0; left: 0; 
             display: grid; 
-            /* پیش‌فرض ۵x۵ */
             grid-template-columns: repeat(5, 1fr); 
             grid-template-rows: repeat(5, 1fr); 
             z-index: 2; pointer-events: none; gap: 1px; padding: 2px; transform-style: preserve-3d; 
         }
         .grid-container.active { pointer-events: all; }
-        .grid-cell { border: 1px solid rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.1s; position: relative; }
-        .grid-cell:hover { background: rgba(255,255,255,0.4); }
+        .grid-cell { border: 1px dashed rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.1s; position: relative; background: rgba(0,0,0,0.05); }
+        .grid-cell:hover { background: rgba(255,255,255,0.3); }
         .grid-cell.selected { background: rgba(76, 175, 80, 0.8); border: 2px solid #4CAF50; }
 
         /* محتویات خانه‌ها */
@@ -153,48 +175,25 @@
         .cell-content.street-cell { background-color: #333; }
         .cell-content.shop-cell { background-color: #fff3e0; border: 1px solid #ff9800; font-size: 15px; display: flex; justify-content: center; align-items: center; }
 
-        /* ================= ساختمان‌ها (زاویه ۱۸۰ و روی خط مربع) ================= */
-        .cell-content img.building-img { 
-            width: 90%; 
-            height: 90%; 
-            object-fit: contain; 
-            /* چرخش به راست تا رو به دوربین باشه */
-            transform: rotateZ(45deg) translateY(-10px); 
-            transform-origin: bottom center;
-            mix-blend-mode: multiply;
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.4));
-        }
-
-        /* ================= کاراکترها ================= */
-        .char-img, .citizen { 
-            position: absolute; 
-            z-index: 5; 
-            mix-blend-mode: multiply; 
+        /* استک آجرها */
+        .brick-stack {
+            width: 100%; height: 100%; position: relative; display: flex;
+            justify-content: center; align-items: flex-end; transform-style: preserve-3d;
             pointer-events: none;
-            transform: rotateZ(45deg) translateZ(15px);
+        }
+        
+        .brick-stack img {
+            position: absolute;
+            width: 80%; height: auto;
+            object-fit: contain;
+            mix-blend-mode: multiply; /* حذف پس‌زمینه سفید */
             filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
-        }
-
-        .mayor { width: 30px; }
-        #builder1 { width: 20px; bottom: 5%; right: 35%; transform: rotateZ(45deg) translateZ(15px); }
-        #builder2 { width: 20px; bottom: 5%; right: 25%; transform: rotateZ(45deg) translateZ(15px); }
-
-        .citizen { 
-            width: 18px; 
-            height: auto; 
-            transition: left 4s linear, bottom 1s ease-in-out; 
-        }
-
-        @keyframes walkBob {
-            0%, 100% { transform: rotateZ(45deg) translateZ(15px) translateY(0); }
-            50% { transform: rotateZ(45deg) translateZ(15px) translateY(-3px); }
-        }
-        .citizen.walking, .mayor.walking {
-            animation: walkBob 0.4s infinite alternate ease-in-out;
+            transform: rotateZ(45deg) skewX(-10deg) skewY(-10deg); 
+            transform-origin: bottom center;
         }
 
         /* پنل تعامل */
-        .interaction-panel { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; z-index: 50; transition: transform 0.3s ease; display: flex; flex-direction: column; gap: 10px; }
+        .interaction-panel { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; z-index: 50; transition: transform 0.3s ease; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(5px); }
         .interaction-panel.active { transform: translateX(-50%) translateY(0); }
         .interaction-title { font-size: 16px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
         .interaction-buttons { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
@@ -222,7 +221,7 @@
         .btn-reject { background-color: #f44336; }
         .btn-action { background-color: #2980b9; width: 100%; margin-top: 10px; }
 
-        .profile-form input, .friend-form input, .rename-form input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; text-align: center; }
+        .profile-form input, .rename-form input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; text-align: center; }
         .profile-form button, .rename-form button { width: 100%; padding: 10px; background: #1a3a5c; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
 
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; opacity: 0; transition: opacity 0.3s; z-index: 200; }
@@ -249,35 +248,35 @@
     </div>
 
     <div class="game-container">
+        <!-- نوار بالا (پروفایل و سکه) -->
         <div class="top-bar">
             <div class="profile-info" id="profile-info">
                 <span class="name" id="display-name">شهردار</span>
                 <span class="id">ID: <span id="display-id">---</span></span>
-                <!-- دکمه حذف حساب کاربری -->
                 <button class="delete-account-btn" id="delete-account-btn" title="حذف حساب">🗑️</button>
             </div>
             <div class="stats-info">
                 <div class="coin-info">🪙 <span id="coin-count">۱۰۰۰</span></div>
-                <div class="citizen-info">👥 <span id="citizen-count">۰</span></div>
             </div>
         </div>
 
-        <div class="level-container">
-            <div class="level-info">
-                <span>لول: <span id="level-display">1</span></span>
-                <span id="xp-text">0 / 100 XP</span>
-            </div>
-            <div class="xp-bar-bg">
-                <div class="xp-bar-fill" id="xp-bar"></div>
+        <!-- دایره پیشرفت لول (جایگزین نوار خطی) -->
+        <div class="level-ring-container">
+            <div class="level-ring" id="level-ring">
+                <div class="level-text">
+                    <span id="level-display">1</span>
+                    <span>LVL</span>
+                </div>
             </div>
         </div>
         
+        <!-- دکمه‌های بالا سمت راست (زیر دایره) -->
         <div class="top-right-buttons">
             <button class="icon-btn" id="letter-btn">✉️<span class="badge" id="letter-badge">1</span></button>
-            <button class="icon-btn" id="friends-btn">👥</button>
             <button class="icon-btn" id="daily-btn">🎁</button>
         </div>
 
+        <!-- نوار ابزار سمت چپ -->
         <div class="tool-bar">
             <button id="street-btn" class="action-btn">🛣️</button>
             <button id="wall-btn" class="action-btn">🧱</button>
@@ -286,18 +285,13 @@
             <button id="hammer-btn" class="action-btn">🔨</button>
         </div>
 
+        <!-- صحنه بازی -->
         <div class="scene-wrapper" id="scene-wrapper">
             <div class="scene" id="scene">
                 <div class="ground-container" id="ground-container">
                     <div class="stone-wall" id="stone-wall"></div>
                     <div class="grid-container" id="grid-container"></div>
-                    <div id="citizens-layer"></div>
                 </div>
-                
-                <img src="mayor.jpg" alt="شهردار" class="char-img mayor walking" id="mayor-img">
-                
-                <img src="builder.jpg" alt="سازنده ۱" class="char-img" id="builder1">
-                <img src="builder.jpg" alt="سازنده ۲" class="char-img" id="builder2">
             </div>
         </div>
     </div>
@@ -337,16 +331,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="friends-modal">
-        <div class="modal-content">
-            <h2>دوستان</h2>
-            <div class="friend-form">
-                <input type="text" id="friend-id-input" placeholder="شناسه دوست...">
-                <button class="modal-btn btn-action" id="add-friend-btn">ارسال درخواست دوستی</button>
-            </div>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
@@ -356,7 +340,7 @@
             const loadingText = document.getElementById('loading-text');
             
             let progress = 0;
-            const messages = ["در حال ساخت ساختمان‌ها...", "در حال آوردن شهروندان...", "در حال آماده‌سازی شهردار...", "آماده!"];
+            const messages = ["در حال ساخت ساختمان‌ها...", "در حال آماده‌سازی زمین...", "آماده!"];
             
             const interval = setInterval(() => {
                 progress += Math.random() * 15;
@@ -365,16 +349,13 @@
                 
                 if (progress < 30) loadingText.innerText = messages[0];
                 else if (progress < 60) loadingText.innerText = messages[1];
-                else if (progress < 90) loadingText.innerText = messages[2];
-                else loadingText.innerText = messages[3];
+                else loadingText.innerText = messages[2];
 
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
                         loadingScreen.classList.add('hidden');
-                        startCitizens();
                         startLetterSystem();
-                        startMayorWalking();
                     }, 500);
                 }
             }, 150);
@@ -408,22 +389,13 @@
             { id: 'port', img: 'port.jpg', price: 110, name: 'بندر', xp: 55 }
         ];
 
-        let TOTAL_CELLS = 25; // شروع با ۲۵ مربع
+        let TOTAL_CELLS = 25; 
         let currentCols = 5;
         let currentRows = 5;
-        const CITIZEN_IMAGES = ['citizen1.jpg', 'citizen2.jpg', 'citizen3.jpg', 'citizen4.jpg'];
-        
-        const SHOP_REASONS = [
-            "برای فروش نان تازه", "برای تعمیر موبایل", "برای فروش لباس", 
-            "برای باز کردن کافه", "برای فروش میوه", "برای تعمیر خودرو",
-            "برای فروش کتاب", "برای باز کردن رستوران", "برای فروش گل"
-        ];
 
         let userCoins = parseInt(localStorage.getItem('shahrdar_coins')) || 1000;
         let userId = localStorage.getItem('shahrdar_id');
         let userProfile = localStorage.getItem('shahrdar_profile');
-        
-        // آرایه ۲۵ تایی برای شروع
         let cityGrid = JSON.parse(localStorage.getItem('shahrdar_city')) || Array(TOTAL_CELLS).fill(null);
         
         let landLevel = parseInt(localStorage.getItem('shahrdar_land')) || 1;
@@ -442,7 +414,6 @@
         const displayId = document.getElementById('display-id');
         const displayName = document.getElementById('display-name');
         const coinCount = document.getElementById('coin-count');
-        const citizenCount = document.getElementById('citizen-count');
         const gridContainer = document.getElementById('grid-container');
         const groundContainer = document.getElementById('ground-container');
         const buildModal = document.getElementById('build-modal');
@@ -453,11 +424,9 @@
         const renameModal = document.getElementById('rename-modal');
         const newNameInput = document.getElementById('new-name-input');
         const saveNameBtn = document.getElementById('save-name-btn');
-        const citizensLayer = document.getElementById('citizens-layer');
         
         const levelDisplay = document.getElementById('level-display');
-        const xpText = document.getElementById('xp-text');
-        const xpBar = document.getElementById('xp-bar');
+        const levelRing = document.getElementById('level-ring');
 
         const intPanel = document.getElementById('interaction-panel');
         const intTitle = document.getElementById('int-title');
@@ -473,11 +442,10 @@
         const acceptLetterBtn = document.getElementById('accept-letter-btn');
         const rejectLetterBtn = document.getElementById('reject-letter-btn');
 
-        // دکمه حذف حساب
         const deleteAccountBtn = document.getElementById('delete-account-btn');
         if (deleteAccountBtn) {
             deleteAccountBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // جلوگیری از باز شدن rename
+                e.stopPropagation();
                 if (confirm('آیا مطمئنید می‌خواهید حساب کاربری خود را حذف کنید؟ تمام پیشرفت شما پاک خواهد شد.')) {
                     localStorage.clear();
                     location.reload();
@@ -491,14 +459,20 @@
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
+        // ================= آپدیت UI (به همراه دایره پیشرفت) =================
         function updateUI() {
             displayName.innerText = userProfile || 'شهردار';
             displayId.innerText = userId;
             coinCount.innerText = userCoins;
             
             levelDisplay.innerText = userLevel;
-            xpText.innerText = `${userXP} / ${xpNeeded} XP`;
-            xpBar.style.width = (userXP / xpNeeded * 100) + '%';
+            
+            // محاسبه درصد پیشرفت XP
+            const progressPercent = (userXP / xpNeeded) * 100;
+            
+            // اعمال به دایره (conic-gradient)
+            // رنگ سبز از 0 تا درصد پیشرفت، و بقیه خاکستری
+            levelRing.style.background = `conic-gradient(#4CAF50 ${progressPercent}%, #555 ${progressPercent}%)`;
 
             if (userProfile) document.getElementById('profile-modal').classList.remove('active');
             if (hasWall) stoneWall.classList.add('active');
@@ -521,114 +495,27 @@
                 localStorage.setItem('shahrdar_coins', userCoins.toString());
                 
                 showToast(`🎉 تبریک! شما به لول ${userLevel} رسیدید و ۵۰۰ سکه جایزه گرفتید!`);
-                
-                document.body.style.transition = 'background-color 0.5s';
-                document.body.style.backgroundColor = '#f1c40f';
-                setTimeout(() => {
-                    document.body.style.backgroundColor = '';
-                }, 500);
             }
             
             localStorage.setItem('shahrdar_xp', userXP.toString());
             updateUI();
         }
 
-        // ================= حرکت خودکار شهردار =================
-        function startMayorWalking() {
-            const mayor = document.getElementById('mayor-img');
-            let mayorX = 50; 
-            let direction = 1;
-
-            setInterval(() => {
-                mayorX += direction * (Math.random() * 0.5); 
-                
-                if (mayorX > 80) {
-                    mayorX = 80;
-                    direction = -1;
-                    mayor.style.transform = 'scaleX(-1) rotateZ(45deg) translateZ(15px)';
-                } else if (mayorX < 20) {
-                    mayorX = 20;
-                    direction = 1;
-                    mayor.style.transform = 'scaleX(1) rotateZ(45deg) translateZ(15px)';
-                }
-                
-                mayor.style.left = mayorX + '%';
-                mayor.style.bottom = '10%'; 
-            }, 100);
-        }
-
-        // ================= شهروندان =================
-        let citizens = [];
-        const CITIZEN_COUNT = 5;
-
-        function startCitizens() {
-            citizensLayer.innerHTML = '';
-            citizens = [];
-            
-            for (let i = 0; i < CITIZEN_COUNT; i++) { 
-                createCitizen(i); 
-            }
-            citizenCount.innerText = citizens.length;
-        }
-
-        function createCitizen(index) {
-            const randomImg = CITIZEN_IMAGES[Math.floor(Math.random() * CITIZEN_IMAGES.length)];
-            const el = document.createElement('img');
-            el.className = 'citizen walking';
-            el.src = randomImg;
-            el.alt = 'citizen';
-            
-            const lineY = 30; 
-            const startX = 10 + (index * 15); 
-            
-            el.style.left = startX + '%';
-            el.style.bottom = lineY + '%';
-            citizensLayer.appendChild(el);
-            citizens.push({ el: el, direction: 1, speed: 0.5 + Math.random() * 0.5 });
-            
-            moveCitizenInLine(el, index);
-        }
-
-        function moveCitizenInLine(el, index) {
-            setInterval(() => {
-                if (!el.parentNode) return;
-                
-                let currentLeft = parseFloat(el.style.left);
-                let citizenData = citizens.find(c => c.el === el);
-                
-                if (!citizenData) return;
-                
-                currentLeft += citizenData.direction * citizenData.speed;
-                
-                if (currentLeft > 90) {
-                    currentLeft = 90;
-                    citizenData.direction = -1;
-                    el.style.transform = 'scaleX(1) rotateZ(45deg) translateZ(15px)'; 
-                } else if (currentLeft < 5) {
-                    currentLeft = 5;
-                    citizenData.direction = 1;
-                    el.style.transform = 'scaleX(-1) rotateZ(45deg) translateZ(15px)';
-                }
-                
-                el.style.left = currentLeft + '%';
-            }, 50); 
-        }
-
-        // ================= نامه‌ها =================
+        // نامه‌ها
         let currentLetter = null;
 
         function startLetterSystem() {
             const sendLetter = () => {
                 const randomTime = 15000 + Math.random() * 15000;
                 setTimeout(() => {
-                    if (!currentLetter && citizens.length > 0) {
-                        const randomImg = CITIZEN_IMAGES[Math.floor(Math.random() * CITIZEN_IMAGES.length)];
-                        const randomReason = SHOP_REASONS[Math.floor(Math.random() * SHOP_REASONS.length)];
+                    if (!currentLetter) {
+                        const randomReason = [
+                            "برای فروش نان تازه", "برای تعمیر موبایل", "برای فروش لباس", 
+                            "برای باز کردن کافه", "برای فروش میوه", "برای تعمیر خودرو",
+                            "برای فروش کتاب", "برای باز کردن رستوران", "برای فروش گل"
+                        ][Math.floor(Math.random() * 9)];
                         
-                        currentLetter = {
-                            emoji: randomImg,
-                            reason: randomReason
-                        };
+                        currentLetter = { reason: randomReason };
                         
                         letterBadge.classList.add('show');
                         showToast('یک نامه جدید از طرف شهروند دریافت کردید! ✉️');
@@ -643,7 +530,7 @@
         letterBtn.addEventListener('click', () => {
             if (currentLetter) {
                 letterBadge.classList.remove('show');
-                letterEmoji.innerHTML = `<img src="${currentLetter.emoji}" style="width:60px; height:60px; object-fit:contain; mix-blend-mode: multiply;">`;
+                letterEmoji.innerText = '👨‍💼';
                 letterSender.innerText = 'یک شهروند';
                 letterReason.innerText = `دلیل درخواست: «${currentLetter.reason}»`;
                 letterModal.classList.add('active');
@@ -703,13 +590,11 @@
             showToast('نام با موفقیت تغییر کرد!');
         });
 
-        // تابع برای بزرگ کردن زمین و اضافه کردن خانه‌ها
         function expandLand() {
             const newCols = currentCols + 2;
             const newRows = currentRows + 2;
             const newTotal = newCols * newRows;
             
-            // بزرگ کردن آرایه و کپی کردن مقادیر قبلی
             let newGrid = Array(newTotal).fill(null);
             for (let i = 0; i < Math.min(TOTAL_CELLS, newTotal); i++) {
                 newGrid[i] = cityGrid[i];
@@ -720,17 +605,14 @@
             currentRows = newRows;
             cityGrid = newGrid;
             
-            // تنظیم گرید CSS
             gridContainer.style.gridTemplateColumns = `repeat(${newCols}, 1fr)`;
             gridContainer.style.gridTemplateRows = `repeat(${newRows}, 1fr)`;
             
-            // بزرگ کردن زمین سه بعدی
             const groundWidth = 1000 + ((currentCols - 5) * 100);
             const groundHeight = 800 + ((currentRows - 5) * 100);
             groundContainer.style.width = groundWidth + 'px';
             groundContainer.style.height = groundHeight + 'px';
             
-            // تغییر سایز صحنه برای اسکرول
             const sceneWidth = 1500 + ((currentCols - 5) * 120);
             const sceneHeight = 1200 + ((currentRows - 5) * 120);
             document.getElementById('scene').style.width = sceneWidth + 'px';
@@ -739,14 +621,8 @@
             drawGrid();
         }
 
-        function applyLandSize() {
-            const scale = Math.pow(1.05, landLevel - 1);
-            groundContainer.style.transform = `translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg) scale(${scale})`;
-        }
-
         function drawGrid() {
             gridContainer.innerHTML = '';
-            // تنظیم گرید بر اساس ابعاد فعلی
             gridContainer.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
             gridContainer.style.gridTemplateRows = `repeat(${currentRows}, 1fr)`;
             
@@ -766,7 +642,18 @@
                         content.classList.add('shop-cell');
                         content.innerText = '🏪';
                     } else {
-                        content.innerHTML = `<img src="${cityGrid[i].img}" class="building-img" alt="${cityGrid[i].name}">`;
+                        // استک آجرها
+                        let brickHtml = '<div class="brick-stack">';
+                        const numBricks = Math.floor(Math.random() * 5) + 5; // بین ۵ تا ۱۰ آجر
+                        for(let j=0; j<numBricks; j++) {
+                            // موقعیت تصادفی برای آجرها روی هم
+                            const left = Math.random() * 20 - 10;
+                            const bottom = j * 5;
+                            const rotate = Math.random() * 10 - 5;
+                            brickHtml += `<img src="brick.jpg" style="left: ${left}%; bottom: ${bottom}%; transform: rotateZ(45deg) rotate(${rotate}deg);" alt="brick">`;
+                        }
+                        brickHtml += '</div>';
+                        content.innerHTML = brickHtml;
                     }
                     cell.appendChild(content);
                 }
@@ -825,7 +712,6 @@
             showToast('یک خانه خالی برای خیابان انتخاب کنید');
         });
 
-        // **تغییر دکمه گسترش زمین**
         document.getElementById('land-btn').addEventListener('click', () => {
             const cost = 100 * landLevel;
             if (userCoins < cost) return showToast(`به ${cost} سکه نیاز دارید!`);
@@ -835,7 +721,6 @@
             localStorage.setItem('shahrdar_land', landLevel.toString());
             updateUI();
             
-            // گسترش زمین (اضافه کردن خانه‌ها و بزرگ کردن)
             expandLand();
             
             showToast(`زمین بزرگتر شد! سطح ${landLevel} - تعداد خانه‌ها: ${TOTAL_CELLS}`);
