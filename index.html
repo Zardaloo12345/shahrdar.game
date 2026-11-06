@@ -5,17 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
     <title>شهردار | شهر صلح</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; user-select: none; }
         
-        /* ================= استایل کلی صفحه (زمین به عنوان پس‌زمینه) ================= */
+        /* ================= پس‌زمینه و ساختار کلی ================= */
         body {
-            /* استفاده از الگوی شطرنجی به عنوان پس‌زمینه اصلی */
-            background-color: #8ebf56;
-            background-image: 
-                linear-gradient(45deg, #a4d16b 25%, transparent 25%, transparent 75%, #a4d16b 75%, #a4d16b),
-                linear-gradient(45deg, #a4d16b 25%, transparent 25%, transparent 75%, #a4d16b 75%, #a4d16b);
-            background-size: 60px 60px;
-            background-position: 0 0, 30px 30px;
+            background: linear-gradient(135deg, #8ebf56, #a4d16b);
             display: flex; justify-content: center; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden; 
         }
@@ -69,43 +63,27 @@
         .stats-info { display: flex; gap: 8px; }
         .coin-info { background: #f1c40f; color: #333; }
 
-        /* ================= دایره پیشرفت (Level Ring) ================= */
+        /* دایره پیشرفت */
         .level-ring-container {
-            position: absolute; top: 15px; right: 15px; 
-            width: 70px; height: 70px;
-            z-index: 20;
-            pointer-events: none;
+            position: absolute; top: 15px; right: 15px; width: 70px; height: 70px; z-index: 20;
         }
-
         .level-ring {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(#4CAF50 0%, #555 0%); /* درصد پیشرفت اینجا اعمال میشه */
+            width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(#4CAF50 0%, #555 0%);
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative;
             transition: background 0.3s ease;
         }
-
-        /* دایره داخلی (برای اینکه حلقه به نظر برسه) */
         .level-ring::before {
-            content: '';
-            position: absolute;
-            width: 80%; height: 80%;
-            background: rgba(0,0,0,0.85);
-            border-radius: 50%;
-            z-index: 1;
+            content: ''; position: absolute; width: 80%; height: 80%;
+            background: rgba(0,0,0,0.85); border-radius: 50%; z-index: 1;
         }
-
         .level-text {
-            position: relative; z-index: 2;
-            color: white; font-weight: bold; font-size: 18px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            position: relative; z-index: 2; color: white; font-weight: bold; font-size: 18px;
             text-align: center; line-height: 1;
         }
         .level-text span { display: block; font-size: 10px; color: #aaa; margin-top: 2px;}
 
-        /* دکمه‌های بالا سمت راست (زیر دایره) */
         .top-right-buttons { display: flex; gap: 8px; position: absolute; top: 90px; right: 15px; z-index: 20; pointer-events: auto;}
         .icon-btn { background: rgba(0,0,0,0.6); border: none; color: white; font-size: 18px; padding: 8px 10px; border-radius: 50%; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); backdrop-filter: blur(5px);}
         .badge { position: absolute; top: -2px; right: -2px; background: #e74c3c; color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; border: 2px solid #1a3a5c; animation: pulse 1s infinite; }
@@ -117,44 +95,33 @@
         .action-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.6); border: 2px solid #fff; color: white; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
         .action-btn:active { transform: scale(0.9); }
 
-        /* ================= صحنه بازی (قابل اسکرول) ================= */
+        /* ================= صحنه بازی ================= */
         .scene-wrapper {
             width: 100%; height: 100%;
             position: absolute; top: 0; left: 0;
-            overflow: auto; 
             display: flex; justify-content: center; align-items: center;
-            z-index: 1;
+            z-index: 1; overflow: hidden;
         }
         
         .scene { 
-            width: 1500px; height: 1200px; 
+            width: 100%; height: 100%; 
             position: relative; 
             display: flex; justify-content: center; align-items: center; 
-            perspective: 1500px;
-            flex-shrink: 0;
         }
 
-        /* ظرف زمین اصلی (بدون پس‌زمینه اضافی) */
+        /* زمین افقی */
         .ground-container {
             position: absolute; 
-            width: 1000px; height: 800px; 
+            width: 90%; max-width: 1000px; height: 80%;
             top: 50%; left: 50%; 
-            transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg);
-            transition: transform 0.3s ease-out;
+            transform: translate(-50%, -50%);
             z-index: 1; 
-            transform-style: preserve-3d;
-            
-            /* خود زمین الگوی شطرنجی داره */
             background-color: transparent;
-            border: 4px solid rgba(0,0,0,0.2);
+            border: 4px solid rgba(255,255,255,0.3);
             border-radius: 15px;
-            box-shadow: 0 40px 60px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+            overflow: hidden; 
         }
-
-        /* دیوار */
-        .stone-wall { position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; border: 20px solid #555; border-radius: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 15px 25px rgba(0,0,0,0.6); display: none; z-index: 3; pointer-events: none; background: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); }
-        .stone-wall.active { display: block; animation: wallAppear 0.5s ease-out; }
-        @keyframes wallAppear { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         /* شبکه خانه‌ها */
         .grid-container { 
@@ -162,34 +129,35 @@
             display: grid; 
             grid-template-columns: repeat(5, 1fr); 
             grid-template-rows: repeat(5, 1fr); 
-            z-index: 2; pointer-events: none; gap: 1px; padding: 2px; transform-style: preserve-3d; 
+            z-index: 2; pointer-events: none; gap: 2px; padding: 5px; 
         }
         .grid-container.active { pointer-events: all; }
-        .grid-cell { border: 1px dashed rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.1s; position: relative; background: rgba(0,0,0,0.05); }
-        .grid-cell:hover { background: rgba(255,255,255,0.3); }
-        .grid-cell.selected { background: rgba(76, 175, 80, 0.8); border: 2px solid #4CAF50; }
+        .grid-cell { 
+            border: 1px dashed rgba(0,0,0,0.2); 
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; transition: all 0.1s; position: relative; 
+            background: rgba(255,255,255,0.05);
+        }
+        .grid-cell:hover { background: rgba(255,255,255,0.2); }
+        .grid-cell.selected { background: rgba(76, 175, 80, 0.6); border: 2px solid #4CAF50; }
 
         /* محتویات خانه‌ها */
         .cell-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        .cell-content.grass-cell { background-image: url('grass.jpg'); background-size: cover; background-position: center; }
+        .cell-content.grass-cell { background-image: url('grass.jpg'); background-size: cover; }
         .cell-content.street-cell { background-color: #333; }
         .cell-content.shop-cell { background-color: #fff3e0; border: 1px solid #ff9800; font-size: 15px; display: flex; justify-content: center; align-items: center; }
 
-        /* استک آجرها */
+        /* استک آجرها (برای نمایش ساختمان) */
         .brick-stack {
             width: 100%; height: 100%; position: relative; display: flex;
             justify-content: center; align-items: flex-end; transform-style: preserve-3d;
             pointer-events: none;
         }
-        
         .brick-stack img {
-            position: absolute;
-            width: 80%; height: auto;
-            object-fit: contain;
-            mix-blend-mode: multiply; /* حذف پس‌زمینه سفید */
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
-            transform: rotateZ(45deg) skewX(-10deg) skewY(-10deg); 
-            transform-origin: bottom center;
+            position: absolute; width: 70%; height: auto; object-fit: contain;
+            mix-blend-mode: multiply;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+            transform: translateY(-5px);
         }
 
         /* پنل تعامل */
@@ -207,7 +175,6 @@
         .modal-overlay.active { display: flex; }
         .modal-content { background: #fff; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; color: #333; max-height: 80vh; overflow-y: auto; }
         .modal-content h2 { margin-bottom: 15px; font-size: 18px; }
-        .modal-content p { margin-bottom: 10px; }
 
         .building-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; max-height: 60vh; overflow-y: auto; padding: 5px; }
         .building-item { width: 100%; aspect-ratio: 1; background: #f0f0f0; border-radius: 10px; cursor: pointer; padding: 5px; border: 2px solid transparent; transition: all 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
@@ -248,7 +215,6 @@
     </div>
 
     <div class="game-container">
-        <!-- نوار بالا (پروفایل و سکه) -->
         <div class="top-bar">
             <div class="profile-info" id="profile-info">
                 <span class="name" id="display-name">شهردار</span>
@@ -260,7 +226,6 @@
             </div>
         </div>
 
-        <!-- دایره پیشرفت لول (جایگزین نوار خطی) -->
         <div class="level-ring-container">
             <div class="level-ring" id="level-ring">
                 <div class="level-text">
@@ -270,13 +235,11 @@
             </div>
         </div>
         
-        <!-- دکمه‌های بالا سمت راست (زیر دایره) -->
         <div class="top-right-buttons">
             <button class="icon-btn" id="letter-btn">✉️<span class="badge" id="letter-badge">1</span></button>
             <button class="icon-btn" id="daily-btn">🎁</button>
         </div>
 
-        <!-- نوار ابزار سمت چپ -->
         <div class="tool-bar">
             <button id="street-btn" class="action-btn">🛣️</button>
             <button id="wall-btn" class="action-btn">🧱</button>
@@ -285,11 +248,9 @@
             <button id="hammer-btn" class="action-btn">🔨</button>
         </div>
 
-        <!-- صحنه بازی -->
         <div class="scene-wrapper" id="scene-wrapper">
             <div class="scene" id="scene">
                 <div class="ground-container" id="ground-container">
-                    <div class="stone-wall" id="stone-wall"></div>
                     <div class="grid-container" id="grid-container"></div>
                 </div>
             </div>
@@ -334,33 +295,181 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loadingScreen = document.getElementById('loading-screen');
-            const progressBar = document.getElementById('progress-bar');
-            const loadingText = document.getElementById('loading-text');
-            
-            let progress = 0;
-            const messages = ["در حال ساخت ساختمان‌ها...", "در حال آماده‌سازی زمین...", "آماده!"];
-            
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 100) progress = 100;
-                progressBar.style.width = progress + '%';
-                
-                if (progress < 30) loadingText.innerText = messages[0];
-                else if (progress < 60) loadingText.innerText = messages[1];
-                else loadingText.innerText = messages[2];
+        // ================= متغیرهای اصلی =================
+        let TOTAL_CELLS = 25; 
+        let currentCols = 5;
+        let currentRows = 5;
+        let userCoins = parseInt(localStorage.getItem('shahrdar_coins')) || 1000;
+        let userId = localStorage.getItem('shahrdar_id');
+        let userProfile = localStorage.getItem('shahrdar_profile');
+        let cityGrid = JSON.parse(localStorage.getItem('shahrdar_city')) || Array(TOTAL_CELLS).fill(null);
+        let landLevel = parseInt(localStorage.getItem('shahrdar_land')) || 1;
+        let hasWall = localStorage.getItem('shahrdar_wall') === 'true';
+        let lastDaily = localStorage.getItem('shahrdar_daily') || 0;
+        let userLevel = parseInt(localStorage.getItem('shahrdar_level')) || 1;
+        let userXP = parseInt(localStorage.getItem('shahrdar_xp')) || 0;
+        let xpNeeded = userLevel * 100;
 
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        loadingScreen.classList.add('hidden');
-                        startLetterSystem();
-                    }, 500);
+        if (!userId) {
+            userId = Math.floor(1000 + Math.random() * 9000).toString();
+            localStorage.setItem('shahrdar_id', userId);
+        }
+
+        const displayId = document.getElementById('display-id');
+        const displayName = document.getElementById('display-name');
+        const coinCount = document.getElementById('coin-count');
+        const gridContainer = document.getElementById('grid-container');
+        const groundContainer = document.getElementById('ground-container');
+        const buildModal = document.getElementById('build-modal');
+        const buildingGrid = document.getElementById('building-grid');
+        const toast = document.getElementById('toast');
+        const stoneWall = document.getElementById('stone-wall');
+        const profileInfo = document.getElementById('profile-info');
+        const renameModal = document.getElementById('rename-modal');
+        const newNameInput = document.getElementById('new-name-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
+        const levelDisplay = document.getElementById('level-display');
+        const levelRing = document.getElementById('level-ring');
+        const intPanel = document.getElementById('interaction-panel');
+        const intTitle = document.getElementById('int-title');
+        const intButtons = document.getElementById('int-buttons');
+        const closePanelBtn = document.getElementById('close-panel-btn');
+        const letterBtn = document.getElementById('letter-btn');
+        const letterBadge = document.getElementById('letter-badge');
+        const letterModal = document.getElementById('letter-modal');
+        const letterEmoji = document.getElementById('letter-emoji');
+        const letterSender = document.getElementById('letter-sender');
+        const letterReason = document.getElementById('letter-reason');
+        const acceptLetterBtn = document.getElementById('accept-letter-btn');
+        const rejectLetterBtn = document.getElementById('reject-letter-btn');
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+        // ================= توابع پایه =================
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function updateUI() {
+            displayName.innerText = userProfile || 'شهردار';
+            displayId.innerText = userId;
+            coinCount.innerText = userCoins;
+            levelDisplay.innerText = userLevel;
+            const progressPercent = (userXP / xpNeeded) * 100;
+            levelRing.style.background = `conic-gradient(#4CAF50 ${progressPercent}%, #555 ${progressPercent}%)`;
+            if (userProfile) document.getElementById('profile-modal').classList.remove('active');
+            if (hasWall) stoneWall.classList.add('active');
+            else stoneWall.classList.remove('active');
+        }
+        updateUI();
+
+        function addXP(amount) {
+            userXP += amount;
+            while (userXP >= xpNeeded) {
+                userXP -= xpNeeded;
+                userLevel++;
+                xpNeeded = userLevel * 100;
+                userCoins += 500;
+                localStorage.setItem('shahrdar_level', userLevel.toString());
+                localStorage.setItem('shahrdar_xp', userXP.toString());
+                localStorage.setItem('shahrdar_coins', userCoins.toString());
+                showToast(`🎉 تبریک! شما به لول ${userLevel} رسیدید و ۵۰۰ سکه جایزه گرفتید!`);
+            }
+            localStorage.setItem('shahrdar_xp', userXP.toString());
+            updateUI();
+        }
+
+        // ================= رویداد حذف حساب =================
+        if (deleteAccountBtn) {
+            deleteAccountBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm('آیا مطمئنید می‌خواهید حساب کاربری خود را حذف کنید؟ تمام پیشرفت شما پاک خواهد شد.')) {
+                    localStorage.clear();
+                    location.reload();
                 }
-            }, 150);
+            });
+        }
+
+        // ================= سیستم نامه =================
+        let currentLetter = null;
+        function startLetterSystem() {
+            const sendLetter = () => {
+                const randomTime = 15000 + Math.random() * 15000;
+                setTimeout(() => {
+                    if (!currentLetter) {
+                        const randomReason = ["برای فروش نان تازه", "برای تعمیر موبایل", "برای فروش لباس", "برای باز کردن کافه", "برای فروش میوه"][Math.floor(Math.random() * 5)];
+                        currentLetter = { reason: randomReason };
+                        letterBadge.classList.add('show');
+                        showToast('یک نامه جدید از طرف شهروند دریافت کردید! ✉️');
+                    }
+                    sendLetter();
+                }, randomTime);
+            };
+            sendLetter();
+        }
+
+        letterBtn.addEventListener('click', () => {
+            if (currentLetter) {
+                letterBadge.classList.remove('show');
+                letterEmoji.innerText = '👨‍💼';
+                letterSender.innerText = 'یک شهروند';
+                letterReason.innerText = `دلیل درخواست: «${currentLetter.reason}»`;
+                letterModal.classList.add('active');
+            } else {
+                showToast('نامه جدیدی ندارید.');
+            }
         });
 
+        acceptLetterBtn.addEventListener('click', () => {
+            letterModal.classList.remove('active');
+            const emptyCells = cityGrid.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+            if (emptyCells.length > 0) {
+                const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                cityGrid[randomIndex] = { type: 'shop', name: 'مغازه', img: '🏪' };
+                localStorage.setItem('shahrdar_city', JSON.stringify(cityGrid));
+                drawGrid();
+                showToast('مجوز صادر شد! یک مغازه جدید ساخته شد. 🏪');
+                addXP(10);
+            } else {
+                showToast('زمین خالی برای ساخت مغازه وجود ندارد!');
+            }
+            currentLetter = null;
+        });
+
+        rejectLetterBtn.addEventListener('click', () => {
+            letterModal.classList.remove('active');
+            showToast('شما درخواست را رد کردید.');
+            currentLetter = null;
+        });
+
+        // ================= پروفایل =================
+        document.getElementById('save-profile-btn').addEventListener('click', () => {
+            const name = document.getElementById('username-input').value.trim();
+            if (name === '') return alert('نام را وارد کنید!');
+            userProfile = name;
+            localStorage.setItem('shahrdar_profile', userProfile);
+            updateUI();
+        });
+
+        profileInfo.addEventListener('click', () => {
+            if (userProfile) {
+                newNameInput.value = userProfile;
+                renameModal.classList.add('active');
+            }
+        });
+
+        saveNameBtn.addEventListener('click', () => {
+            const newName = newNameInput.value.trim();
+            if (newName === '') return alert('نام را وارد کنید!');
+            userProfile = newName;
+            localStorage.setItem('shahrdar_profile', userProfile);
+            updateUI();
+            renameModal.classList.remove('active');
+            showToast('نام با موفقیت تغییر کرد!');
+        });
+
+        // ================= دیتای ساختمان‌ها =================
         const buildingData = [
             { id: 'stadium', img: 'stadium.jpg', price: 40, name: 'ورزشگاه', xp: 25 },
             { id: 'hospital', img: 'hospital.jpg', price: 60, name: 'بیمارستان', xp: 35 },
@@ -389,238 +498,7 @@
             { id: 'port', img: 'port.jpg', price: 110, name: 'بندر', xp: 55 }
         ];
 
-        let TOTAL_CELLS = 25; 
-        let currentCols = 5;
-        let currentRows = 5;
-
-        let userCoins = parseInt(localStorage.getItem('shahrdar_coins')) || 1000;
-        let userId = localStorage.getItem('shahrdar_id');
-        let userProfile = localStorage.getItem('shahrdar_profile');
-        let cityGrid = JSON.parse(localStorage.getItem('shahrdar_city')) || Array(TOTAL_CELLS).fill(null);
-        
-        let landLevel = parseInt(localStorage.getItem('shahrdar_land')) || 1;
-        let hasWall = localStorage.getItem('shahrdar_wall') === 'true';
-        let lastDaily = localStorage.getItem('shahrdar_daily') || 0;
-
-        let userLevel = parseInt(localStorage.getItem('shahrdar_level')) || 1;
-        let userXP = parseInt(localStorage.getItem('shahrdar_xp')) || 0;
-        let xpNeeded = userLevel * 100;
-
-        if (!userId) {
-            userId = Math.floor(1000 + Math.random() * 9000).toString();
-            localStorage.setItem('shahrdar_id', userId);
-        }
-
-        const displayId = document.getElementById('display-id');
-        const displayName = document.getElementById('display-name');
-        const coinCount = document.getElementById('coin-count');
-        const gridContainer = document.getElementById('grid-container');
-        const groundContainer = document.getElementById('ground-container');
-        const buildModal = document.getElementById('build-modal');
-        const buildingGrid = document.getElementById('building-grid');
-        const toast = document.getElementById('toast');
-        const stoneWall = document.getElementById('stone-wall');
-        const profileInfo = document.getElementById('profile-info');
-        const renameModal = document.getElementById('rename-modal');
-        const newNameInput = document.getElementById('new-name-input');
-        const saveNameBtn = document.getElementById('save-name-btn');
-        
-        const levelDisplay = document.getElementById('level-display');
-        const levelRing = document.getElementById('level-ring');
-
-        const intPanel = document.getElementById('interaction-panel');
-        const intTitle = document.getElementById('int-title');
-        const intButtons = document.getElementById('int-buttons');
-        const closePanelBtn = document.getElementById('close-panel-btn');
-        
-        const letterBtn = document.getElementById('letter-btn');
-        const letterBadge = document.getElementById('letter-badge');
-        const letterModal = document.getElementById('letter-modal');
-        const letterEmoji = document.getElementById('letter-emoji');
-        const letterSender = document.getElementById('letter-sender');
-        const letterReason = document.getElementById('letter-reason');
-        const acceptLetterBtn = document.getElementById('accept-letter-btn');
-        const rejectLetterBtn = document.getElementById('reject-letter-btn');
-
-        const deleteAccountBtn = document.getElementById('delete-account-btn');
-        if (deleteAccountBtn) {
-            deleteAccountBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (confirm('آیا مطمئنید می‌خواهید حساب کاربری خود را حذف کنید؟ تمام پیشرفت شما پاک خواهد شد.')) {
-                    localStorage.clear();
-                    location.reload();
-                }
-            });
-        }
-
-        function showToast(msg) {
-            toast.innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-
-        // ================= آپدیت UI (به همراه دایره پیشرفت) =================
-        function updateUI() {
-            displayName.innerText = userProfile || 'شهردار';
-            displayId.innerText = userId;
-            coinCount.innerText = userCoins;
-            
-            levelDisplay.innerText = userLevel;
-            
-            // محاسبه درصد پیشرفت XP
-            const progressPercent = (userXP / xpNeeded) * 100;
-            
-            // اعمال به دایره (conic-gradient)
-            // رنگ سبز از 0 تا درصد پیشرفت، و بقیه خاکستری
-            levelRing.style.background = `conic-gradient(#4CAF50 ${progressPercent}%, #555 ${progressPercent}%)`;
-
-            if (userProfile) document.getElementById('profile-modal').classList.remove('active');
-            if (hasWall) stoneWall.classList.add('active');
-            else stoneWall.classList.remove('active');
-        }
-        updateUI();
-
-        function addXP(amount) {
-            userXP += amount;
-            
-            while (userXP >= xpNeeded) {
-                userXP -= xpNeeded;
-                userLevel++;
-                xpNeeded = userLevel * 100;
-                
-                userCoins += 500;
-                
-                localStorage.setItem('shahrdar_level', userLevel.toString());
-                localStorage.setItem('shahrdar_xp', userXP.toString());
-                localStorage.setItem('shahrdar_coins', userCoins.toString());
-                
-                showToast(`🎉 تبریک! شما به لول ${userLevel} رسیدید و ۵۰۰ سکه جایزه گرفتید!`);
-            }
-            
-            localStorage.setItem('shahrdar_xp', userXP.toString());
-            updateUI();
-        }
-
-        // نامه‌ها
-        let currentLetter = null;
-
-        function startLetterSystem() {
-            const sendLetter = () => {
-                const randomTime = 15000 + Math.random() * 15000;
-                setTimeout(() => {
-                    if (!currentLetter) {
-                        const randomReason = [
-                            "برای فروش نان تازه", "برای تعمیر موبایل", "برای فروش لباس", 
-                            "برای باز کردن کافه", "برای فروش میوه", "برای تعمیر خودرو",
-                            "برای فروش کتاب", "برای باز کردن رستوران", "برای فروش گل"
-                        ][Math.floor(Math.random() * 9)];
-                        
-                        currentLetter = { reason: randomReason };
-                        
-                        letterBadge.classList.add('show');
-                        showToast('یک نامه جدید از طرف شهروند دریافت کردید! ✉️');
-                    }
-                    sendLetter();
-                }, randomTime);
-            };
-            
-            sendLetter();
-        }
-
-        letterBtn.addEventListener('click', () => {
-            if (currentLetter) {
-                letterBadge.classList.remove('show');
-                letterEmoji.innerText = '👨‍💼';
-                letterSender.innerText = 'یک شهروند';
-                letterReason.innerText = `دلیل درخواست: «${currentLetter.reason}»`;
-                letterModal.classList.add('active');
-            } else {
-                showToast('نامه جدیدی ندارید.');
-            }
-        });
-
-        acceptLetterBtn.addEventListener('click', () => {
-            letterModal.classList.remove('active');
-            
-            const emptyCells = cityGrid.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
-            
-            if (emptyCells.length > 0) {
-                const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                cityGrid[randomIndex] = { type: 'shop', name: 'مغازه', img: '🏪' };
-                localStorage.setItem('shahrdar_city', JSON.stringify(cityGrid));
-                drawGrid();
-                showToast('مجوز صادر شد! یک مغازه جدید ساخته شد. 🏪');
-                
-                addXP(10);
-            } else {
-                showToast('زمین خالی برای ساخت مغازه وجود ندارد!');
-            }
-            
-            currentLetter = null;
-        });
-
-        rejectLetterBtn.addEventListener('click', () => {
-            letterModal.classList.remove('active');
-            showToast('شما درخواست را رد کردید.');
-            currentLetter = null;
-        });
-
-        document.getElementById('save-profile-btn').addEventListener('click', () => {
-            const name = document.getElementById('username-input').value.trim();
-            if (name === '') return alert('نام را وارد کنید!');
-            userProfile = name;
-            localStorage.setItem('shahrdar_profile', userProfile);
-            updateUI();
-        });
-
-        profileInfo.addEventListener('click', () => {
-            if (userProfile) {
-                newNameInput.value = userProfile;
-                renameModal.classList.add('active');
-            }
-        });
-
-        saveNameBtn.addEventListener('click', () => {
-            const newName = newNameInput.value.trim();
-            if (newName === '') return alert('نام را وارد کنید!');
-            userProfile = newName;
-            localStorage.setItem('shahrdar_profile', userProfile);
-            updateUI();
-            renameModal.classList.remove('active');
-            showToast('نام با موفقیت تغییر کرد!');
-        });
-
-        function expandLand() {
-            const newCols = currentCols + 2;
-            const newRows = currentRows + 2;
-            const newTotal = newCols * newRows;
-            
-            let newGrid = Array(newTotal).fill(null);
-            for (let i = 0; i < Math.min(TOTAL_CELLS, newTotal); i++) {
-                newGrid[i] = cityGrid[i];
-            }
-            
-            TOTAL_CELLS = newTotal;
-            currentCols = newCols;
-            currentRows = newRows;
-            cityGrid = newGrid;
-            
-            gridContainer.style.gridTemplateColumns = `repeat(${newCols}, 1fr)`;
-            gridContainer.style.gridTemplateRows = `repeat(${newRows}, 1fr)`;
-            
-            const groundWidth = 1000 + ((currentCols - 5) * 100);
-            const groundHeight = 800 + ((currentRows - 5) * 100);
-            groundContainer.style.width = groundWidth + 'px';
-            groundContainer.style.height = groundHeight + 'px';
-            
-            const sceneWidth = 1500 + ((currentCols - 5) * 120);
-            const sceneHeight = 1200 + ((currentRows - 5) * 120);
-            document.getElementById('scene').style.width = sceneWidth + 'px';
-            document.getElementById('scene').style.height = sceneHeight + 'px';
-            
-            drawGrid();
-        }
-
+        // ================= رسم شبکه =================
         function drawGrid() {
             gridContainer.innerHTML = '';
             gridContainer.style.gridTemplateColumns = `repeat(${currentCols}, 1fr)`;
@@ -642,15 +520,12 @@
                         content.classList.add('shop-cell');
                         content.innerText = '🏪';
                     } else {
-                        // استک آجرها
+                        // آجرها برای نمایش ساختمان
                         let brickHtml = '<div class="brick-stack">';
-                        const numBricks = Math.floor(Math.random() * 5) + 5; // بین ۵ تا ۱۰ آجر
-                        for(let j=0; j<numBricks; j++) {
-                            // موقعیت تصادفی برای آجرها روی هم
+                        for(let j=0; j<10; j++) {
                             const left = Math.random() * 20 - 10;
-                            const bottom = j * 5;
-                            const rotate = Math.random() * 10 - 5;
-                            brickHtml += `<img src="brick.jpg" style="left: ${left}%; bottom: ${bottom}%; transform: rotateZ(45deg) rotate(${rotate}deg);" alt="brick">`;
+                            const bottom = j * 3;
+                            brickHtml += `<img src="brick.jpg" style="left: ${left}%; bottom: ${bottom}%;" alt="brick">`;
                         }
                         brickHtml += '</div>';
                         content.innerHTML = brickHtml;
@@ -665,21 +540,21 @@
                             cell.classList.add('selected');
                             window.selectedCellIndex = i;
                         } else {
+                            showToast('این خانه پر است!');
+                        }
+                    } else {
+                        if (cityGrid[i]) {
                             if (cityGrid[i].type !== 'grass' && cityGrid[i].type !== 'street') {
                                 openInteractionPanel(cityGrid[i].name, i);
                             }
-                        }
-                    } else {
-                        if (cityGrid[i] && cityGrid[i].type !== 'grass' && cityGrid[i].type !== 'street') {
-                            openInteractionPanel(cityGrid[i].name, i);
                         }
                     }
                 });
                 gridContainer.appendChild(cell);
             }
         }
-        drawGrid();
 
+        // ================= ساخت و ساز (فوری، بدون انیمیشن) =================
         document.getElementById('hammer-btn').addEventListener('click', () => {
             buildingGrid.innerHTML = '';
             buildingData.forEach((b) => {
@@ -688,16 +563,54 @@
                 div.innerHTML = `<img src="${b.img}"><span class="price-tag">${b.price} 🪙</span>`;
                 div.onclick = () => {
                     if (userCoins < b.price) return showToast('سکه کافی ندارید!');
-                    window.pendingBuilding = b;
+                    
+                    // تعداد آجر لازم (تصادفی ۱۰ تا ۵۰)
+                    const bricksNeeded = Math.floor(Math.random() * 41) + 10;
+                    window.pendingBuilding = { ...b, bricksNeeded: bricksNeeded };
+                    
                     buildModal.classList.remove('active');
                     gridContainer.classList.add('active');
-                    showToast('یک خانه را انتخاب کنید');
+                    showToast(`برای ساخت این ساختمان به ${bricksNeeded} آجر نیاز دارید. یک خانه انتخاب کنید.`);
                 };
                 buildingGrid.appendChild(div);
             });
             buildModal.classList.add('active');
         });
 
+        // کلیک روی خانه برای ساخت فوری
+        gridContainer.addEventListener('click', (e) => {
+            const cell = e.target.closest('.grid-cell');
+            if (!cell) return;
+            const index = parseInt(cell.dataset.index);
+            
+            if (window.pendingBuilding && !cityGrid[index]) {
+                const b = window.pendingBuilding;
+                
+                // کم کردن سکه
+                userCoins -= b.price;
+                localStorage.setItem('shahrdar_coins', userCoins.toString());
+                updateUI();
+                
+                // ساخت فوری (ذخیره در خانه)
+                cityGrid[index] = { type: 'building', img: b.img, name: b.name };
+                localStorage.setItem('shahrdar_city', JSON.stringify(cityGrid));
+                
+                // آپدیت گرید
+                drawGrid();
+                
+                // اضافه کردن XP
+                addXP(b.xp || 10);
+                
+                // پاک کردن حالت انتخاب
+                window.pendingBuilding = null;
+                gridContainer.classList.remove('active');
+                document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('selected'));
+                
+                showToast(`${b.name} ساخته شد!`);
+            }
+        });
+
+        // ================= دکمه‌های دیگر =================
         document.getElementById('grass-btn').addEventListener('click', () => {
             if (userCoins < 10) return showToast('برای چمن ۱۰ سکه نیاز دارید!');
             window.pendingBuilding = { type: 'grass', price: 10, name: 'چمن', xp: 2 };
@@ -721,9 +634,22 @@
             localStorage.setItem('shahrdar_land', landLevel.toString());
             updateUI();
             
-            expandLand();
+            const newCols = currentCols + 1;
+            const newRows = currentRows + 1;
+            const newTotal = newCols * newRows;
             
-            showToast(`زمین بزرگتر شد! سطح ${landLevel} - تعداد خانه‌ها: ${TOTAL_CELLS}`);
+            let newGrid = Array(newTotal).fill(null);
+            for (let i = 0; i < Math.min(TOTAL_CELLS, newTotal); i++) {
+                newGrid[i] = cityGrid[i];
+            }
+            
+            TOTAL_CELLS = newTotal;
+            currentCols = newCols;
+            currentRows = newRows;
+            cityGrid = newGrid;
+            
+            drawGrid();
+            showToast(`زمین بزرگتر شد! سطح ${landLevel}`);
         });
 
         document.getElementById('wall-btn').addEventListener('click', () => {
@@ -752,30 +678,7 @@
             showToast('جایزه روزانه ۱۰ سکه دریافت شد! 🎁');
         });
 
-        gridContainer.addEventListener('click', (e) => {
-            const cell = e.target.closest('.grid-cell');
-            if (!cell) return;
-            const index = parseInt(cell.dataset.index);
-            
-            if (window.pendingBuilding && !cityGrid[index]) {
-                const b = window.pendingBuilding;
-                userCoins -= b.price;
-                localStorage.setItem('shahrdar_coins', userCoins.toString());
-                
-                cityGrid[index] = { type: b.type || 'building', img: b.img, name: b.name };
-                localStorage.setItem('shahrdar_city', JSON.stringify(cityGrid));
-                
-                drawGrid();
-                updateUI();
-                
-                addXP(b.xp || 10); 
-                
-                window.pendingBuilding = null;
-                gridContainer.classList.remove('active');
-                showToast(`${b.name} ساخته شد!`);
-            }
-        });
-
+        // ================= پنل تعامل =================
         function openInteractionPanel(buildingName, index) {
             intPanel.classList.add('active');
             intTitle.innerText = buildingName;
@@ -798,58 +701,15 @@
                 }
             };
             intButtons.appendChild(sellBtn);
-
-            if (buildingName === 'آبفا') {
-                const cutBtn = document.createElement('button');
-                cutBtn.className = 'int-btn danger';
-                cutBtn.innerText = 'قطع آب (+120)';
-                cutBtn.onclick = () => {
-                    if (confirm('مطمئنید؟ شهروندان ناراضی می‌شوند!')) {
-                        userCoins += 120;
-                        localStorage.setItem('shahrdar_coins', userCoins.toString());
-                        updateUI();
-                        showToast('آب قطع شد و ۱۲۰ سکه گرفتید!');
-                    }
-                };
-                intButtons.appendChild(cutBtn);
-
-                const connectBtn = document.createElement('button');
-                connectBtn.className = 'int-btn success';
-                connectBtn.innerText = 'وصل آب';
-                connectBtn.onclick = () => showToast('آب وصل شد!');
-                intButtons.appendChild(connectBtn);
-            }
-
-            if (buildingName === 'شهرداری') {
-                const fireBtn = document.createElement('button');
-                fireBtn.className = 'int-btn danger';
-                fireBtn.innerText = 'اخراج شهروندان';
-                fireBtn.onclick = () => {
-                    localStorage.setItem('shahrdar_citizens', 'false');
-                    showToast('شهروندان اخراج شدند!');
-                    intPanel.classList.remove('active');
-                };
-                intButtons.appendChild(fireBtn);
-            }
-
-            if (buildingName === 'کتابخانه') {
-                const bookBtn = document.createElement('button');
-                bookBtn.className = 'int-btn success';
-                bookBtn.innerText = 'کتاب جدید (-۱)';
-                bookBtn.onclick = () => {
-                    if (userCoins < 1) return showToast('سکه کافی ندارید!');
-                    userCoins -= 1;
-                    localStorage.setItem('shahrdar_coins', userCoins.toString());
-                    updateUI();
-                    showToast('کتاب اضافه شد!');
-                };
-                intButtons.appendChild(bookBtn);
-            }
         }
 
         closePanelBtn.addEventListener('click', () => {
             intPanel.classList.remove('active');
         });
+
+        // ================= شروع =================
+        drawGrid();
+        startLetterSystem();
     </script>
 </body>
     </html>
