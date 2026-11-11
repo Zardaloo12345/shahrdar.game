@@ -7,10 +7,10 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; user-select: none; }
         
-        /* ================= پس‌زمینه ================= */
+        /* ================= پس‌زمینه آسمان ================= */
         body {
-            background: linear-gradient(135deg, #1a3a5c, #2c3e50); /* آسمان شبانه/تاریک برای برجسته شدن زمین */
-            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(to bottom, #87CEEB, #e0f6ff);
+            display: flex; justify-content: center; align-items: flex-end;
             height: 100vh; width: 100vw; overflow: hidden; 
         }
 
@@ -31,7 +31,7 @@
         /* ================= استایل‌های اصلی ================= */
         .game-container {
             width: 100%; height: 100%; display: flex;
-            flex-direction: column; padding: 10px; position: relative;
+            flex-direction: column; position: relative;
             overflow: hidden; 
         }
 
@@ -94,38 +94,46 @@
         .action-btn { width: 50px; height: 50px; border-radius: 50%; background-color: rgba(0,0,0,0.6); border: 2px solid #fff; color: white; font-size: 22px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
         .action-btn:active { transform: scale(0.9); }
 
-        /* ================= صحنه بازی (سه بعدی) ================= */
+        /* ================= صحنه بازی (دوربین 2.5D Isometric) ================= */
         .scene-wrapper {
             width: 100%; height: 100%;
             position: absolute; top: 0; left: 0;
-            display: flex; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: flex-end;
             z-index: 1; overflow: hidden;
-            perspective: 1200px; /* ایجاد عمق سه بعدی */
+            perspective: 1000px; /* عمق دوربین */
         }
         
         .scene { 
             width: 100%; height: 100%; 
             position: relative; 
-            display: flex; justify-content: center; align-items: center; 
+            display: flex; justify-content: center; align-items: flex-end; 
+            transform-style: preserve-3d;
         }
 
-        /* زمین سه بعدی (زاویه ضلع قاعده مکعب) */
+        /* زمین ایزومتریک (چسبیده به کف) */
         .ground-container {
             position: absolute; 
-            width: 85%; max-width: 900px; height: 70%;
-            top: 55%; left: 50%; 
-            transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg); /* زاویه ایزومتریک */
+            width: 100%; max-width: 1200px; height: 70%;
+            bottom: -15%; 
+            left: 50%; 
+            /* زاویه ایزومتریک استاندارد 2.5D */
+            transform: translateX(-50%) rotateX(55deg) rotateZ(-45deg); 
             z-index: 1; 
-            background-color: #a4d16b;
-            background-image: 
-                linear-gradient(45deg, #8ebf56 25%, transparent 25%, transparent 75%, #8ebf56 75%, #8ebf56),
-                linear-gradient(45deg, #8ebf56 25%, transparent 25%, transparent 75%, #8ebf56 75%, #8ebf56);
-            background-size: 60px 60px;
-            background-position: 0 0, 30px 30px;
-            border: 6px solid #6b9c3b;
-            border-radius: 10px;
-            box-shadow: 0 30px 50px rgba(0,0,0,0.5);
             transform-style: preserve-3d;
+            
+            /* سبز سبز (بافت چمن) */
+            background: linear-gradient(135deg, #66BB6A, #2E7D32); 
+            background-image: 
+                radial-gradient(circle at 20% 80%, #388E3C 1px, transparent 1px),
+                radial-gradient(circle at 80% 20%, #388E3C 1px, transparent 1px),
+                linear-gradient(135deg, #4CAF50, #2E7D32);
+            background-size: 30px 30px, 30px 30px, 100% 100%;
+            
+            border: 8px solid #1B5E20;
+            border-radius: 20px;
+            box-shadow: 
+                0 30px 50px rgba(0,0,0,0.6), /* سایه بیرونی */
+                inset 0 0 40px rgba(0,0,0,0.3); /* سایه داخلی */
         }
 
         /* شبکه خانه‌ها */
@@ -134,23 +142,28 @@
             display: grid; 
             grid-template-columns: repeat(5, 1fr); 
             grid-template-rows: repeat(5, 1fr); 
-            z-index: 2; gap: 1px; padding: 2px; transform-style: preserve-3d;
+            z-index: 2; gap: 2px; padding: 5px; transform-style: preserve-3d;
         }
         .grid-container.active { pointer-events: all; }
         .grid-cell { 
-            border: 1px dashed rgba(0,0,0,0.1); 
+            border: 1px dashed rgba(255,255,255,0.2); 
             display: flex; justify-content: center; align-items: center; 
-            cursor: pointer; transition: all 0.1s; position: relative; 
+            cursor: pointer; transition: all 0.2s ease; position: relative; 
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
         }
-        .grid-cell:hover { background: rgba(255,255,255,0.3); }
-        .grid-cell.selected { background: rgba(76, 175, 80, 0.6); border: 2px solid #4CAF50; }
+        .grid-cell:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+        .grid-cell.selected { background: rgba(76, 175, 80, 0.8); border: 2px solid #fff; }
 
-        /* محتویات خانه‌ها */
-        .cell-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        .cell-content.grass-cell { background-image: url('grass.jpg'); background-size: cover; background-position: center; }
-        .cell-content.street-cell { background-color: #333; }
+        /* محتویات خانه‌ها (ساختمان‌ها) */
+        .cell-content { 
+            width: 100%; height: 100%; 
+            display: flex; justify-content: center; align-items: center; 
+            position: relative; 
+            transform-style: preserve-3d;
+        }
 
-        /* ================= آجرهای منظم ================= */
+        /* آجرهای منظم و سه بعدی */
         .brick-wall {
             width: 80%;
             height: 80%;
@@ -159,16 +172,21 @@
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             gap: 2px;
-            transform: translateZ(10px); /* بلند شدن از زمین */
+            /* چرخش معکوس زمین تا آجرها صاف دیده بشن و عمق بگیرن */
+            transform: rotateZ(45deg) rotateX(-55deg) translateZ(15px); 
+            transform-origin: bottom center;
         }
 
         .brick {
             background-color: #c06a3b;
             border-radius: 2px;
             border: 1px solid #8b4513;
-            box-shadow: 1px 1px 0 #5a2c0c;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
             transform: scale(0.9);
         }
+
+        /* آسمان و ابرها */
+        .sky-element { position: absolute; font-size: 40px; opacity: 0.6; z-index: 0; }
 
         /* پنل تعامل */
         .interaction-panel { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; z-index: 50; transition: transform 0.3s ease; display: flex; flex-direction: column; gap: 10px; }
@@ -263,6 +281,11 @@
 
         <div class="scene-wrapper" id="scene-wrapper">
             <div class="scene" id="scene">
+                <!-- ابرها (برای زیبایی) -->
+                <div class="sky-element" style="top: 10%; left: 10%;">☁️</div>
+                <div class="sky-element" style="top: 20%; right: 15%;">☁️</div>
+                <div class="sky-element" style="top: 5%; left: 50%;">☁️</div>
+
                 <div class="ground-container" id="ground-container">
                     <div class="grid-container" id="grid-container"></div>
                 </div>
@@ -308,8 +331,6 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ================= مدیریت صدا (بدون صدا) =================
-
         // ================= صفحه بارگذاری =================
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -531,11 +552,12 @@
                     const content = document.createElement('div');
                     content.className = 'cell-content';
                     if (cityGrid[i].type === 'grass') {
-                        content.classList.add('grass-cell');
+                        content.style.backgroundImage = "url('grass.jpg')";
+                        content.style.backgroundSize = 'cover';
                     } else if (cityGrid[i].type === 'street') {
-                        content.classList.add('street-cell');
+                        content.style.backgroundColor = '#333';
                     } else if (cityGrid[i].type === 'shop') {
-                        content.classList.add('shop-cell');
+                        content.style.backgroundColor = '#fff3e0';
                         content.innerText = '🏪';
                     } else {
                         // آجرهای منظم
@@ -714,4 +736,4 @@
         startLetterSystem();
     </script>
 </body>
-        </html>
+                </html>
