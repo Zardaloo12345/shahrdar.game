@@ -7,327 +7,214 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; user-select: none; }
         
-        /* ================= پس‌زمینه متحرک (آسمان) ================= */
+        /* پس‌زمینه و ساختار */
         body {
-            background: linear-gradient(to bottom, #2980b9, #6dd5fa, #ffffff);
-            display: flex; justify-content: center; align-items: center;
+            background: #1a252f; display: flex; justify-content: center; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden; 
-            position: relative;
         }
 
-        /* ابرهای متحرک */
-        .cloud {
-            position: absolute; background: rgba(255,255,255,0.8);
-            border-radius: 50%; filter: blur(15px); z-index: 0;
-            animation: moveClouds linear infinite;
-        }
-        .cloud-1 { width: 200px; height: 60px; top: 10%; left: -200px; animation-duration: 25s; }
-        .cloud-2 { width: 300px; height: 80px; top: 20%; left: -300px; animation-duration: 35s; animation-delay: 5s;}
-        .cloud-3 { width: 150px; height: 50px; top: 5%; left: -150px; animation-duration: 20s; animation-delay: 10s;}
-        .cloud-4 { width: 250px; height: 70px; top: 30%; left: -250px; animation-duration: 40s; animation-delay: 2s;}
-
-        @keyframes moveClouds {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(120vw); }
-        }
-
-        /* ================= صفحه بارگذاری ================= */
+        /* صفحه بارگذاری */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #1a252f; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         #loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .loader-logo { font-size: 80px; margin-bottom: 20px; animation: bounce 1.5s infinite alternate; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));}
-        .loader-title { color: #f1c40f; font-size: 28px; font-weight: bold; margin-bottom: 30px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .progress-bar-container { width: 80%; max-width: 300px; height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);}
-        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #e67e22); border-radius: 10px; transition: width 0.1s linear; box-shadow: 0 0 10px #f1c40f;}
-        .loading-text { color: #bdc3c7; font-size: 14px; margin-top: 15px; letter-spacing: 2px;}
+        .loader-logo { font-size: 60px; margin-bottom: 20px; animation: bounce 1s infinite alternate; }
+        .loader-title { color: #f1c40f; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
+        .progress-bar-container { width: 80%; max-width: 300px; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background: #f1c40f; transition: width 0.1s linear; }
+        .loading-text { color: white; font-size: 14px; margin-top: 15px; }
+        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
 
-        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-20px); } }
+        /* صفحه ورود (قبل از نقشه) */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a252f; z-index: 5000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #auth-screen.hidden { opacity: 0; visibility: hidden; }
+        .auth-box {
+            background: rgba(44, 62, 80, 0.9); padding: 30px; border-radius: 20px;
+            border: 2px solid #34495e; display: flex; flex-direction: column; gap: 15px;
+            width: 320px; text-align: center; backdrop-filter: blur(10px);
+        }
+        .auth-box h2 { color: #f1c40f; margin-bottom: 10px; }
+        .auth-box input { padding: 12px; border-radius: 10px; border: none; font-size: 16px; text-align: center; }
+        .auth-box button { padding: 12px; border-radius: 10px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-login { background: #27ae60; }
+        .btn-register { background: #3498db; }
 
-        /* ================= بازی ================= */
-        .game-container {
-            width: 100%; height: 100%; display: flex;
-            position: relative; overflow: hidden; z-index: 1;
+        /* ================= صفحه اصلی (نقشه) ================= */
+        #main-map-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; /* در ابتدا مخفی */
+            background-image: url('main-map.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #main-map-screen.active { display: block; }
+
+        /* نقاط داغ (Hotspots) */
+        .hotspot {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0);
+            /* border: 2px solid red; */ /* برای تنظیم دقیق، این خط رو از کامنت دربیار */
+        }
+        .hotspot:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
         }
 
-        /* ================= نوار بالا (HUD شیشه‌ای) ================= */
+        /* مختصات دقیق نقاط روی عکس */
+        #mine-1 { top: 15%; left: 12%; width: 18%; height: 22%; }
+        #mine-2 { top: 15%; right: 12%; width: 18%; height: 22%; }
+        #mine-3 { bottom: 20%; left: 12%; width: 18%; height: 22%; }
+        #portal { top: 35%; left: 42%; width: 16%; height: 25%; }
+        #bank { bottom: 20%; right: 15%; width: 18%; height: 22%; }
+        #chest { top: 10%; left: 46%; width: 8%; height: 12%; }
+
+        /* ================= نوار بالا (HUD) ================= */
         .top-bar {
-            position: absolute; top: 15px; left: 20px; right: 20px;
+            position: absolute; top: 15px; left: 15px; right: 15px;
             display: flex; justify-content: space-between; align-items: flex-start; z-index: 20;
             pointer-events: none;
         }
-        
-        /* دایره لول */
-        .level-ring-container { width: 85px; height: 85px; pointer-events: auto; position: relative; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));}
-        .level-ring {
-            width: 100%; height: 100%; border-radius: 50%;
-            background: conic-gradient(#4CAF50 0%, #2c3e50 0%);
-            display: flex; justify-content: center; align-items: center;
-            position: relative; transition: background 0.5s ease;
-            animation: glow 2s infinite alternate;
+        .stat-container {
+            display: flex; gap: 10px; pointer-events: auto;
         }
-        @keyframes glow { 0% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); } 100% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.9); } }
-        
-        .level-ring::before { content: ''; position: absolute; width: 80%; height: 80%; background: linear-gradient(135deg, #2c3e50, #1a252f); border-radius: 50%; z-index: 1; box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); }
-        .level-text { position: relative; z-index: 2; color: white; font-weight: bold; font-size: 24px; text-align: center; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
-        .level-text span { display: block; font-size: 10px; color: #f1c40f; margin-top: 2px; font-weight: bold; letter-spacing: 1px;}
-        .xp-text { position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 11px; white-space: nowrap; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 10px;}
-
-        /* نمایش سکه و بانک */
-        .stats-container { display: flex; gap: 15px; pointer-events: auto; margin-right: auto; }
         .stat-box {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 10px 20px;
-            display: flex; align-items: center; gap: 8px; color: white;
-            font-weight: bold; font-size: 18px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+            color: white; font-weight: bold; font-size: 16px;
+            display: flex; align-items: center; gap: 5px;
         }
-        .stat-box:hover { transform: scale(1.05); }
-
-        /* ================= نقشه سه بعدی ================= */
-        .map-wrapper {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            perspective: 1200px; /* برای افکت سه بعدی */
-            width: 95%; max-width: 900px; height: 75%; max-height: 550px;
+        .logout-btn {
+            background: #e74c3c; color: white; border: none; border-radius: 30px;
+            padding: 10px 20px; font-weight: bold; cursor: pointer; pointer-events: auto;
         }
 
-        .map-container {
-            width: 100%; height: 100%;
-            border-radius: 20px; border: 6px solid rgba(255,255,255,0.8);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6), inset 0 0 50px rgba(0,0,0,0.2);
-            overflow: hidden; z-index: 1;
-            background-image: url('map-background.jpg'); 
-            background-size: cover; background-position: center;
-            transform: rotateX(15deg); /* کج کردن نقشه */
-            transition: transform 0.5s ease;
-            position: relative;
-        }
-        
-        .map-container:hover { transform: rotateX(5deg) scale(1.02); } /* افکت تعامل */
-
-        /* ================= اسلات‌های ساخت (Hotspots) ================= */
-        .build-slot {
-            position: absolute; border-radius: 15px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: all 0.3s ease;
-            border: 3px dashed rgba(255,255,255,0.7);
-            background: rgba(0,0,0,0.3);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-            transform-style: preserve-3d;
-        }
-        .build-slot:hover { background: rgba(255,255,255,0.2); border-color: #fff; transform: scale(1.05); }
-        
-        /* موقعیت اسلات‌ها */
-        .slot-1 { top: 15%; left: 25%; width: 12%; height: 18%; }
-        .slot-2 { top: 40%; left: 48%; width: 14%; height: 20%; }
-        .slot-3 { top: 60%; left: 75%; width: 12%; height: 18%; }
-        .slot-4 { top: 65%; left: 20%; width: 12%; height: 18%; }
-
-        /* ساختمان ساخته شده (شناور و درخشان) */
-        .built-building {
-            width: 100%; height: 100%; border-radius: 15px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 50px; text-shadow: 0 10px 15px rgba(0,0,0,0.6);
-            animation: float 3s ease-in-out infinite, popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 15px rgba(255,255,255,0.3);
-            border: 3px solid rgba(255,255,255,0.8);
-        }
-
-        /* سایه زیر ساختمان */
-        .built-building::after {
-            content: ''; position: absolute; bottom: -15px; width: 70%; height: 10px;
-            background: rgba(0,0,0,0.5); border-radius: 50%; filter: blur(5px);
-            animation: shadow 3s ease-in-out infinite;
-        }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes shadow { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(0.8); opacity: 0.2; } }
-        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-        /* افکت شناور شدن سکه (+۱۰) */
-        .floating-text {
-            position: absolute; color: #f1c40f; font-weight: bold; font-size: 24px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.8), 0 0 10px #f1c40f;
-            pointer-events: none; animation: floatUp 1.2s ease-out forwards;
-            z-index: 30;
-        }
-        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-60px) scale(1.5); opacity: 0; } }
-
-        /* افکت جرقه (Particle) */
-        .spark {
-            position: absolute; width: 8px; height: 8px;
-            background: #f1c40f; border-radius: 50%;
-            pointer-events: none; animation: sparkFly 0.8s linear forwards;
-            z-index: 35; box-shadow: 0 0 10px #f1c40f;
-        }
-        @keyframes sparkFly {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
-        }
-
-        /* ================= منوی پایین (Glassmorphism) ================= */
-        .build-menu {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; z-index: 20;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 15px 25px; border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-        }
-        .build-btn {
-            width: 65px; height: 65px; border-radius: 20px;
-            background: rgba(44, 62, 80, 0.8); border: 2px solid rgba(255,255,255,0.2);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: white;
-            position: relative;
-        }
-        .build-btn:hover { transform: translateY(-8px) scale(1.1); border-color: #f1c40f; box-shadow: 0 10px 20px rgba(0,0,0,0.5); background: rgba(52, 73, 94, 0.9);}
-        .build-btn .icon { font-size: 28px; margin-bottom: 2px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));}
-        .build-btn .cost { font-size: 11px; color: #f1c40f; font-weight: bold; }
-        
-        /* قفل بودن */
-        .build-btn.locked { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
-        .build-btn.locked::after { content: '🔒'; position: absolute; top: -5px; right: -5px; font-size: 22px; filter: drop-shadow(0 2px 5px #000); }
-
-        /* ================= مودال‌ها (پنجره‌های شیشه‌ای) ================= */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.6); display: none; 
-            justify-content: center; align-items: center; z-index: 100; 
-            backdrop-filter: blur(5px);
+        /* ================= مودال‌ها ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(5px);
         }
         .modal-overlay.active { display: flex; }
-
-        .modal-content { 
-            background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 25px; 
-            width: 90%; max-width: 380px; text-align: center; 
-            color: #2c3e50; box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 0 4px rgba(255,255,255,0.5);
-            animation: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 4px solid #bdc3c7;
-            position: relative; overflow: hidden;
-        }
         
-        /* افکت نوار رنگی بالای مودال */
-        .modal-content::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px;
-            background: linear-gradient(90deg, #3498db, #9b59b6, #e74c3c);
+        .modal-content {
+            background: #ecf0f1; padding: 30px; border-radius: 25px; 
+            width: 90%; max-width: 400px; text-align: center; color: #2c3e50;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        @keyframes zoomIn { 0% { transform: scale(0.7) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+        .modal-icon { font-size: 60px; margin-bottom: 10px; }
+        .modal-content h2 { margin-bottom: 10px; font-size: 24px; color: #2980b9; }
+        .modal-content p { font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5; }
 
-        .modal-icon { font-size: 70px; margin-bottom: 15px; animation: float 2s infinite alternate; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));}
-        .modal-content h2 { margin-bottom: 10px; font-size: 24px; color: #2980b9; text-shadow: 0 1px 2px rgba(0,0,0,0.1);}
-        .modal-content p { font-size: 15px; color: #555; margin-bottom: 20px; line-height: 1.6; }
-
-        .modal-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 10px;}
-        .modal-btn { 
-            padding: 15px 20px; border: none; border-radius: 15px; 
-            font-size: 16px; font-weight: bold; cursor: pointer; color: white; 
-            flex: 1; transition: all 0.2s; box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-            position: relative; overflow: hidden;
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .modal-btn {
+            padding: 12px 20px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: bold; cursor: pointer; color: white;
+            flex: 1; transition: transform 0.2s;
         }
-        .modal-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(255,255,255,0.2); transform: skewX(-20deg); transition: 0.5s;}
-        .modal-btn:hover::after { left: 100%; }
-        .modal-btn:active { transform: translateY(6px); box-shadow: none;}
-        
-        .btn-yes { background-color: #27ae60; }
-        .btn-no { background-color: #e74c3c; }
-        .btn-deposit { background-color: #3498db; }
-        .btn-withdraw { background-color: #f39c12; }
-        .btn-close { background-color: #7f8c8d; width: 100%; margin-top: 10px;}
+        .modal-btn:hover { transform: translateY(-2px); }
+        .btn-green { background: #27ae60; }
+        .btn-red { background: #e74c3c; }
+        .btn-blue { background: #3498db; }
+        .btn-purple { background: #9b59b6; }
 
+        /* ورودی بانک */
         .bank-input {
-            width: 100%; padding: 18px; font-size: 24px; text-align: center;
-            border: 3px solid #3498db; border-radius: 15px; margin-bottom: 20px;
-            background: #f8f9fa; font-weight: bold; color: #2c3e50;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
-            transition: border-color 0.3s;
+            width: 100%; padding: 15px; font-size: 18px; text-align: center;
+            border: 2px solid #3498db; border-radius: 10px; margin-bottom: 15px;
+            background: #fff; font-weight: bold; color: #2c3e50;
         }
-        .bank-input:focus { outline: none; border-color: #2980b9; background: #fff;}
+        .bank-input:focus { outline: none; border-color: #2980b9; }
 
         /* اعلان (Toast) */
-        .toast-container { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; align-items: center;}
-        .toast { 
-            background: rgba(44, 62, 80, 0.95); color: white; padding: 15px 30px; border-radius: 30px; 
-            font-size: 15px; font-weight: bold; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-left: 6px solid #f1c40f; backdrop-filter: blur(5px);
-            display: flex; align-items: center; gap: 10px;
-        }
-        @keyframes slideUp { 0% { transform: translateY(40px) scale(0.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+        .toast-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .toast { background: rgba(30, 30, 47, 0.95); color: white; padding: 15px 30px; border-radius: 30px; font-size: 15px; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; border-left: 5px solid #f1c40f; }
+        @keyframes slideUp { 0% { transform: translateY(-30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
     </style>
 </head>
 <body id="main-body">
 
-    <!-- ابرها -->
-    <div class="cloud cloud-1"></div>
-    <div class="cloud cloud-2"></div>
-    <div class="cloud cloud-3"></div>
-    <div class="cloud cloud-4"></div>
-
     <!-- صفحه بارگذاری -->
     <div id="loading-screen">
-        <div class="loader-logo">🏙️</div>
+        <div class="loader-logo">🗺️</div>
         <div class="loader-title">شهردار | امپراتوری</div>
         <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
-        <div class="loading-text">در حال ساخت شهر...</div>
+        <div class="loading-text">در حال آماده‌سازی نقشه...</div>
     </div>
 
-    <!-- بازی -->
-    <div class="game-container">
-        
+    <!-- صفحه ورود -->
+    <div id="auth-screen" class="hidden">
+        <div class="auth-box">
+            <h2>ورود به امپراتوری</h2>
+            <input type="text" id="username" placeholder="نام کاربری">
+            <input type="password" id="password" placeholder="رمز عبور">
+            <button class="btn-login" id="btn-login">ورود</button>
+            <button class="btn-register" id="btn-register">ثبت‌نام</button>
+        </div>
+    </div>
+
+    <!-- صفحه اصلی (نقشه) -->
+    <div id="main-map-screen">
         <!-- نوار بالا -->
         <div class="top-bar">
-            <div class="level-ring-container">
-                <div class="level-ring" id="level-ring">
-                    <div class="level-text">
-                        <span id="level-display">1</span>
-                        <span>LVL</span>
-                    </div>
-                </div>
-                <div class="xp-text" id="xp-text">0 / 100 XP</div>
+            <div class="stat-container">
+                <div class="stat-box">🪙 <span id="coin-display">1000</span></div>
+                <div class="stat-box" style="color:#9b59b6;">💎 <span id="diamond-display">0</span></div>
+                <div class="stat-box">🏦 <span id="bank-display">0</span></div>
             </div>
-            
-            <div class="stats-container">
-                <div class="stat-box" style="color: #f1c40f;">🪙 <span id="coin-count">1000</span></div>
-                <div class="stat-box" style="color: #3498db; cursor:pointer;" id="bank-btn-top">🏦 <span id="bank-count">0</span></div>
-            </div>
+            <button class="logout-btn" id="btn-logout">خروج</button>
         </div>
 
-        <!-- نقشه سه بعدی -->
-        <div class="map-wrapper">
-            <div class="map-container" id="map-container">
-                <!-- اسلات‌های ساخت -->
-                <div class="build-slot slot-1" data-slot="1" id="slot-1"></div>
-                <div class="build-slot slot-2" data-slot="2" id="slot-2"></div>
-                <div class="build-slot slot-3" data-slot="3" id="slot-3"></div>
-                <div class="build-slot slot-4" data-slot="4" id="slot-4"></div>
-            </div>
-        </div>
+        <!-- نقاط داغ (روی عکس) -->
+        <div class="hotspot" id="mine-1" title="معدن ۱"></div>
+        <div class="hotspot" id="mine-2" title="معدن ۲"></div>
+        <div class="hotspot" id="mine-3" title="معدن ۳"></div>
+        <div class="hotspot" id="portal" title="پرتال حمله"></div>
+        <div class="hotspot" id="bank" title="بانک"></div>
+        <div class="hotspot" id="chest" title="صندوق جایزه"></div>
+    </div>
 
-        <!-- منوی پایین -->
-        <div class="build-menu" id="build-menu">
-            <!-- با JS پر میشه -->
+    <!-- مودال معدن -->
+    <div class="modal-overlay" id="mine-modal">
+        <div class="modal-content">
+            <div class="modal-icon">⛏️</div>
+            <h2>معدن طلا</h2>
+            <p>هر معدن در هر ۱۰ ثانیه ۵ سکه تولید می‌کند.</p>
+            <p style="font-weight:bold; color:#e67e22;">تعداد معدن‌های شما: <span id="modal-mine-count">0</span></p>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-green" id="btn-buy-mine">خرید معدن (۵۰۰ سکه)</button>
+            </div>
+            <button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('mine-modal')">بستن</button>
         </div>
     </div>
 
-    <!-- مودال تایید ساخت -->
-    <div class="modal-overlay" id="build-modal">
+    <!-- مودال پرتال (حمله) -->
+    <div class="modal-overlay" id="portal-modal">
         <div class="modal-content">
-            <div class="modal-icon" id="build-icon">🏢</div>
-            <h2 id="build-title">نام ساختمان</h2>
-            <p id="build-desc">توضیحات...</p>
-            <p style="font-weight:bold; color:#e74c3c; font-size:18px;">هزینه: <span id="build-cost">0</span> سکه</p>
-            <div class="modal-buttons">
-                <button class="modal-btn btn-yes" id="btn-confirm-build">ساخت</button>
-                <button class="modal-btn btn-no" id="btn-cancel-build">لغو</button>
+            <div class="modal-icon">🌀</div>
+            <h2>پرتال حمله</h2>
+            <p>دشمن خود را انتخاب کنید:</p>
+            <div id="portal-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px;">
+                <!-- لیست بازیکنان با JS پر میشه -->
             </div>
+            <button class="modal-btn btn-red" onclick="closeModal('portal-modal')">بستن</button>
         </div>
     </div>
 
@@ -335,286 +222,261 @@
     <div class="modal-overlay" id="bank-modal">
         <div class="modal-content">
             <div class="modal-icon">🏦</div>
-            <h2>بانک مرکزی</h2>
-            <p style="color:#3498db; font-weight:bold; font-size:18px;">موجودی بانک: <span id="modal-bank-balance">0</span> سکه</p>
-            <p style="font-size:13px; color:#888; margin-bottom:15px;">کیف پول: <span id="modal-wallet-balance">0</span> سکه</p>
-            <input type="number" id="bank-amount" class="bank-input" placeholder="0" min="1">
+            <h2>بانک</h2>
+            <p>موجودی بانک: <span id="modal-bank-balance">0</span> سکه</p>
+            <input type="number" class="bank-input" id="bank-amount" placeholder="مقدار...">
             <div class="modal-buttons">
-                <button class="modal-btn btn-deposit" id="btn-deposit">واریز</button>
-                <button class="modal-btn btn-withdraw" id="btn-withdraw">برداشت</button>
+                <button class="modal-btn btn-blue" id="btn-deposit">واریز</button>
+                <button class="modal-btn btn-green" id="btn-withdraw">برداشت</button>
             </div>
-            <button class="modal-btn btn-close" id="btn-close-bank">بستن</button>
+            <button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('bank-modal')">بستن</button>
         </div>
     </div>
 
-    <!-- کانتینر اعلان‌ها -->
+    <!-- مودال صندوق جایزه -->
+    <div class="modal-overlay" id="chest-modal">
+        <div class="modal-content">
+            <div class="modal-icon">🎁</div>
+            <h2>صندوق جایزه روزانه</h2>
+            <p>هر ۲۴ ساعت یک بار می‌توانید جایزه بگیرید!</p>
+            <button class="modal-btn btn-green" id="btn-claim-chest">دریافت جایزه</button>
+            <button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('chest-modal')">بستن</button>
+        </div>
+    </div>
+
+    <!-- مودال نبرد (ساده شده) -->
+    <div class="modal-overlay" id="battle-modal">
+        <div class="modal-content">
+            <div class="modal-icon">⚔️</div>
+            <h2 id="battle-title">نبرد!</h2>
+            <p id="battle-desc">در حال نبرد با دشمن...</p>
+            <button class="modal-btn btn-red" onclick="closeModal('battle-modal')">بستن</button>
+        </div>
+    </div>
+
     <div class="toast-container" id="toast-container"></div>
 
     <script>
-        // ================= دیتای بازی =================
-        const buildingsConfig = {
-            science: { id: 'science', name: 'مرکز علمی', icon: '🔬', cost: 150, income: 10, xp: 50, levelReq: 1, color: '#8e44ad', desc: 'افزایش دانش و تولید درآمد' },
-            hospital: { id: 'hospital', name: 'بیمارستان', icon: '🏥', cost: 200, income: 15, xp: 80, levelReq: 2, color: '#e74c3c', desc: 'سلامت شهروندان را تضمین می‌کند' },
-            school: { id: 'school', name: 'مدرسه', icon: '🏫', cost: 100, income: 5, xp: 30, levelReq: 1, color: '#f39c12', desc: 'آموزش نسل آینده' },
-            park: { id: 'park', name: 'پارک', icon: '🌳', cost: 50, income: 2, xp: 10, levelReq: 1, color: '#27ae60', desc: 'هوای پاک و تفریح شهروندان' }
-        };
-
-        // ================= متغیرهای اصلی =================
+        // ================= متغیرها =================
+        let currentUser = localStorage.getItem('game_current_user') || null;
         let gameState = {
-            coins: parseInt(localStorage.getItem('shahrdar_coins')) || 1000,
-            bank: parseInt(localStorage.getItem('shahrdar_bank')) || 0,
-            level: parseInt(localStorage.getItem('shahrdar_level')) || 1,
-            xp: parseInt(localStorage.getItem('shahrdar_xp')) || 0,
-            xpNeeded: 100,
-            builtSlots: JSON.parse(localStorage.getItem('shahrdar_slots')) || {},
-            lastIncomeTime: parseInt(localStorage.getItem('shahrdar_income_time')) || Date.now()
+            coins: 1000, diamonds: 0, level: 1, bank: 0, mines: 0, lastChestTime: 0
         };
 
-        let selectedBuildingToBuild = null;
-        let selectedSlotForBuild = null;
+        // ================= دیتابیس =================
+        function getUsers() { return JSON.parse(localStorage.getItem('game_users')) || {}; }
+        function saveUsers(users) { localStorage.setItem('game_users', JSON.stringify(users)); }
 
         // ================= توابع =================
-        function getXpNeeded(level) { return level * 100; }
-
         function showToast(msg, color = '#f1c40f') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.style.borderLeftColor = color;
-            toast.innerHTML = `<span>${color === '#f1c40f' ? '🪙' : color === '#e74c3c' ? '⚠️' : '✅'}</span> ${msg}`;
+            toast.textContent = msg;
             container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; setTimeout(() => toast.remove(), 400); }, 2500);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        function saveGame() {
-            localStorage.setItem('shahrdar_coins', gameState.coins);
-            localStorage.setItem('shahrdar_bank', gameState.bank);
-            localStorage.setItem('shahrdar_level', gameState.level);
-            localStorage.setItem('shahrdar_xp', gameState.xp);
-            localStorage.setItem('shahrdar_slots', JSON.stringify(gameState.builtSlots));
-            localStorage.setItem('shahrdar_income_time', gameState.lastIncomeTime);
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function saveUserData() {
+            if (!currentUser) return;
+            const users = getUsers();
+            users[currentUser] = {
+                coins: gameState.coins, diamonds: gameState.diamonds, level: gameState.level,
+                bank: gameState.bank, mines: gameState.mines, lastChestTime: gameState.lastChestTime
+            };
+            saveUsers(users);
         }
 
+        function loadUserData(username) {
+            const users = getUsers();
+            const data = users[username];
+            if (data) {
+                gameState.coins = data.coins;
+                gameState.diamonds = data.diamonds || 0;
+                gameState.level = data.level;
+                gameState.bank = data.bank || 0;
+                gameState.mines = data.mines || 0;
+                gameState.lastChestTime = data.lastChestTime || 0;
+            }
+        }
+
+        // ================= آپدیت UI =================
         function updateUI() {
-            document.getElementById('coin-count').textContent = gameState.coins;
-            document.getElementById('bank-count').textContent = gameState.bank;
-            document.getElementById('modal-wallet-balance').textContent = gameState.coins;
+            document.getElementById('coin-display').textContent = gameState.coins;
+            document.getElementById('diamond-display').textContent = gameState.diamonds;
+            document.getElementById('bank-display').textContent = gameState.bank;
+            
+            // به‌روزرسانی مودال‌ها اگر باز باشند
             document.getElementById('modal-bank-balance').textContent = gameState.bank;
-            
-            gameState.xpNeeded = getXpNeeded(gameState.level);
-            document.getElementById('level-display').textContent = gameState.level;
-            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpNeeded} XP`;
-            
-            let progressPercent = (gameState.xp / gameState.xpNeeded) * 100;
-            if (progressPercent > 100) progressPercent = 100;
-            document.getElementById('level-ring').style.background = `conic-gradient(#4CAF50 ${progressPercent}%, #2c3e50 ${progressPercent}%)`;
-
-            renderBuildMenu();
-            renderSlots();
+            document.getElementById('modal-mine-count').textContent = gameState.mines;
         }
 
-        function renderBuildMenu() {
-            const menu = document.getElementById('build-menu');
-            menu.innerHTML = '';
-            
-            Object.values(buildingsConfig).forEach(b => {
-                const isLocked = gameState.level < b.levelReq;
-                const btn = document.createElement('div');
-                btn.className = `build-btn ${isLocked ? 'locked' : ''}`;
-                btn.innerHTML = `<div class="icon">${b.icon}</div><div class="cost">${b.cost}</div>`;
-                
-                if (!isLocked) {
-                    btn.onclick = () => {
-                        selectedBuildingToBuild = b;
-                        showToast(`ساختمان ${b.name} انتخاب شد. روی یک زمین خالی کلیک کنید.`, '#3498db');
-                    };
+        // ================= شروع نبرد (شبیه‌سازی) =================
+        function startBattleWithPlayer(enemyUsername) {
+            closeModal('portal-modal');
+            openModal('battle-modal');
+            document.getElementById('battle-title').textContent = `نبرد با ${enemyUsername}`;
+            document.getElementById('battle-desc').textContent = 'در حال شبیه‌سازی نبرد...';
+
+            // شبیه‌سازی نتیجه نبرد
+            setTimeout(() => {
+                const win = Math.random() > 0.3;
+                if (win) {
+                    const reward = 100 + Math.floor(Math.random() * 50);
+                    gameState.coins += reward;
+                    gameState.level++;
+                    showToast(`🎉 بردی! جایزه: ${reward} سکه`, '#27ae60');
+                    document.getElementById('battle-desc').textContent = `بردی! جایزه: ${reward} سکه`;
                 } else {
-                    btn.title = `نیاز به لول ${b.levelReq}`;
+                    showToast('💀 باختی! دشمن قوی‌تر بود.', '#e74c3c');
+                    document.getElementById('battle-desc').textContent = 'باختی! دفعه بعد قوی‌تر برگرد.';
                 }
-                menu.appendChild(btn);
-            });
-        }
-
-        function renderSlots() {
-            document.querySelectorAll('.build-slot').forEach(slot => {
-                const slotId = slot.dataset.slot;
-                const buildingId = gameState.builtSlots[slotId];
-                slot.innerHTML = '';
-                
-                if (buildingId) {
-                    const b = buildingsConfig[buildingId];
-                    const builtEl = document.createElement('div');
-                    builtEl.className = 'built-building';
-                    builtEl.innerHTML = b.icon;
-                    builtEl.style.backgroundColor = `${b.color}cc`;
-                    
-                    builtEl.onclick = (e) => {
-                        e.stopPropagation();
-                        if (b.id === 'bank') { document.getElementById('bank-modal').classList.add('active'); }
-                        else { 
-                            showToast(`${b.name} در حال تولید درآمد است...`);
-                            createSparks(e.clientX, e.clientY); // افکت جرقه
-                        }
-                    };
-                    slot.appendChild(builtEl);
-                    slot.style.border = 'none';
-                    slot.style.background = 'transparent';
-                } else {
-                    slot.style.border = '3px dashed rgba(255,255,255,0.7)';
-                    slot.style.background = 'rgba(0,0,0,0.3)';
-                    slot.onclick = (e) => {
-                        if (selectedBuildingToBuild) {
-                            selectedSlotForBuild = slotId;
-                            openBuildModal(selectedBuildingToBuild);
-                        } else {
-                            showToast('اول از منوی پایین یک ساختمان انتخاب کنید.', '#e74c3c');
-                            createSparks(e.clientX, e.clientY, '#e74c3c');
-                        }
-                    };
-                }
-            });
-        }
-
-        // ================= افکت جرقه (Particles) =================
-        function createSparks(x, y, color = '#f1c40f') {
-            for (let i = 0; i < 8; i++) {
-                const spark = document.createElement('div');
-                spark.className = 'spark';
-                spark.style.left = x + 'px';
-                spark.style.top = y + 'px';
-                spark.style.background = color;
-                spark.style.boxShadow = `0 0 10px ${color}`;
-                
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 50 + 20;
-                spark.style.setProperty('--x', Math.cos(angle) * distance + 'px');
-                spark.style.setProperty('--y', Math.sin(angle) * distance + 'px');
-                
-                document.body.appendChild(spark);
-                setTimeout(() => spark.remove(), 800);
-            }
-        }
-
-        // ================= مودال ساخت =================
-        function openBuildModal(building) {
-            document.getElementById('build-icon').textContent = building.icon;
-            document.getElementById('build-title').textContent = building.name;
-            document.getElementById('build-desc').textContent = building.desc;
-            document.getElementById('build-cost').textContent = building.cost;
-            document.getElementById('build-modal').classList.add('active');
-        }
-
-        document.getElementById('btn-cancel-build').onclick = () => {
-            document.getElementById('build-modal').classList.remove('active');
-            selectedBuildingToBuild = null;
-            selectedSlotForBuild = null;
-        };
-
-        document.getElementById('btn-confirm-build').onclick = (e) => {
-            document.getElementById('build-modal').classList.remove('active');
-            
-            if (gameState.coins < selectedBuildingToBuild.cost) {
-                return showToast('سکه کافی ندارید!', '#e74c3c');
-            }
-
-            gameState.coins -= selectedBuildingToBuild.cost;
-            gameState.builtSlots[selectedSlotForBuild] = selectedBuildingToBuild.id;
-            addXP(selectedBuildingToBuild.xp);
-
-            saveGame();
-            updateUI();
-            
-            showToast(`🎉 ${selectedBuildingToBuild.name} ساخته شد!`, '#27ae60');
-            createSparks(e.clientX, e.clientY, '#27ae60'); // جرقه هنگام ساخت
-            
-            selectedBuildingToBuild = null;
-            selectedSlotForBuild = null;
-        };
-
-        // ================= XP و لول =================
-        function addXP(amount) {
-            gameState.xp += amount;
-            while (gameState.xp >= gameState.xpNeeded) {
-                gameState.xp -= gameState.xpNeeded;
-                gameState.level++;
-                gameState.xpNeeded = getXpNeeded(gameState.level);
-                
-                const reward = gameState.level * 100;
-                gameState.coins += reward;
-                showToast(`🎊 تبریک! لول ${gameState.level}. جایزه: ${reward} سکه`, '#f1c40f');
-            }
-        }
-
-        // ================= درآمد خودکار =================
-        setInterval(() => {
-            let totalIncome = 0;
-            let hasBuilding = false;
-
-            Object.values(gameState.builtSlots).forEach(buildingId => {
-                if (buildingId && buildingsConfig[buildingId]) {
-                    totalIncome += buildingsConfig[buildingId].income;
-                    hasBuilding = true;
-                }
-            });
-
-            if (hasBuilding && totalIncome > 0) {
-                gameState.coins += totalIncome;
+                saveUserData();
                 updateUI();
-                saveGame();
-                
-                document.querySelectorAll('.build-slot').forEach(slot => {
-                    if (slot.querySelector('.built-building')) {
-                        const rect = slot.getBoundingClientRect();
-                        const floating = document.createElement('div');
-                        floating.className = 'floating-text';
-                        floating.textContent = `+${totalIncome}`;
-                        floating.style.left = (rect.left + rect.width/2 - 15) + 'px';
-                        floating.style.top = (rect.top + rect.height/2 - 20) + 'px';
-                        document.body.appendChild(floating);
-                        setTimeout(() => floating.remove(), 1200);
-                    }
-                });
+                setTimeout(() => closeModal('battle-modal'), 2000);
+            }, 1500);
+        }
+
+        // ================= لیست پرتال =================
+        function renderPortalList() {
+            const list = document.getElementById('portal-list');
+            list.innerHTML = '';
+            const users = getUsers();
+            let count = 0;
+
+            for (const username in users) {
+                if (username === currentUser) continue;
+                if (count >= 5) break;
+
+                const user = users[username];
+                const el = document.createElement('div');
+                el.style.cssText = 'background: #2c3e50; padding: 10px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: white;';
+                el.innerHTML = `
+                    <div>
+                        <div style="font-weight:bold; color:#3498db;">${username}</div>
+                        <div style="font-size:12px; color:#aaa;">سطح: ${user.level}</div>
+                    </div>
+                    <button class="modal-btn btn-red" style="padding:5px 10px; font-size:12px;" onclick="startBattleWithPlayer('${username}')">حمله</button>
+                `;
+                list.appendChild(el);
+                count++;
             }
-        }, 10000);
 
-        // ================= بانک =================
-        document.getElementById('bank-btn-top').onclick = () => {
+            if (count === 0) {
+                list.innerHTML = '<div style="color:#aaa; text-align:center;">هنوز بازیکن دیگری ثبت‌نام نکرده!</div>';
+            }
+        }
+
+        // ================= رویدادهای نقاط داغ =================
+        document.getElementById('mine-1').onclick = () => openModal('mine-modal');
+        document.getElementById('mine-2').onclick = () => openModal('mine-modal');
+        document.getElementById('mine-3').onclick = () => openModal('mine-modal');
+        
+        document.getElementById('portal').onclick = () => { renderPortalList(); openModal('portal-modal'); };
+        document.getElementById('bank').onclick = () => openModal('bank-modal');
+        document.getElementById('chest').onclick = () => openModal('chest-modal');
+
+        // ================= عملکرد مودال‌ها =================
+        // خرید معدن
+        document.getElementById('btn-buy-mine').onclick = () => {
+            const cost = 500 + (gameState.mines * 100);
+            if (gameState.coins < cost) return showToast('سکه کافی ندارید!', '#e74c3c');
+            gameState.coins -= cost;
+            gameState.mines++;
+            saveUserData();
             updateUI();
-            document.getElementById('bank-amount').value = '';
-            document.getElementById('bank-modal').classList.add('active');
+            showToast('معدن جدید خریداری شد!', '#27ae60');
         };
 
-        document.getElementById('btn-close-bank').onclick = () => {
-            document.getElementById('bank-modal').classList.remove('active');
-        };
-
-        document.getElementById('btn-deposit').onclick = (e) => {
+        // بانک: واریز و برداشت
+        document.getElementById('btn-deposit').onclick = () => {
             const amount = parseInt(document.getElementById('bank-amount').value);
             if (isNaN(amount) || amount <= 0) return showToast('مقدار معتبر وارد کنید!', '#e74c3c');
-            if (amount > gameState.coins) return showToast('موجودی کیف پول کافی نیست!', '#e74c3c');
-
+            if (amount > gameState.coins) return showToast('سکه کافی ندارید!', '#e74c3c');
             gameState.coins -= amount;
             gameState.bank += amount;
-            saveGame();
+            saveUserData();
             updateUI();
             document.getElementById('bank-amount').value = '';
             showToast(`${amount} سکه به بانک واریز شد.`, '#3498db');
-            createSparks(e.clientX, e.clientY, '#3498db');
         };
 
-        document.getElementById('btn-withdraw').onclick = (e) => {
+        document.getElementById('btn-withdraw').onclick = () => {
             const amount = parseInt(document.getElementById('bank-amount').value);
             if (isNaN(amount) || amount <= 0) return showToast('مقدار معتبر وارد کنید!', '#e74c3c');
             if (amount > gameState.bank) return showToast('موجودی بانک کافی نیست!', '#e74c3c');
-
             gameState.bank -= amount;
             gameState.coins += amount;
-            saveGame();
+            saveUserData();
             updateUI();
             document.getElementById('bank-amount').value = '';
             showToast(`${amount} سکه از بانک برداشت شد.`, '#f39c12');
-            createSparks(e.clientX, e.clientY, '#f39c12');
         };
+
+        // صندوق جایزه
+        document.getElementById('btn-claim-chest').onclick = () => {
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            if (now - gameState.lastChestTime < oneDay) {
+                const hours = Math.ceil((oneDay - (now - gameState.lastChestTime)) / (1000 * 60 * 60));
+                return showToast(`جایزه بعدی تا ${hours} ساعت دیگر!`, '#e74c3c');
+            }
+            const reward = 100;
+            gameState.coins += reward;
+            gameState.lastChestTime = now;
+            saveUserData();
+            updateUI();
+            closeModal('chest-modal');
+            showToast(`🎁 ${reward} سکه جایزه گرفتید!`, '#f1c40f');
+        };
+
+        // ================= ورود و ثبت‌نام =================
+        document.getElementById('btn-login').onclick = () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const users = getUsers();
+            if (!users[username] || users[username].password !== password) {
+                return showToast('نام یا رمز اشتباه است!', '#e74c3c');
+            }
+            currentUser = username;
+            localStorage.setItem('game_current_user', currentUser);
+            loadUserData(username);
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-map-screen').classList.add('active');
+            updateUI();
+        };
+
+        document.getElementById('btn-register').onclick = () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            if (!username || !password) return showToast('نام و رمز را پر کن!', '#e74c3c');
+            const users = getUsers();
+            if (users[username]) return showToast('این نام قبلاً گرفته شده!', '#e74c3c');
+            users[username] = { password, coins: 1000, diamonds: 0, level: 1, bank: 0, mines: 0, lastChestTime: 0 };
+            saveUsers(users);
+            showToast('ثبت‌نام موفق! حالا وارد شو.', '#27ae60');
+        };
+
+        document.getElementById('btn-logout').onclick = () => {
+            currentUser = null;
+            localStorage.removeItem('game_current_user');
+            document.getElementById('main-map-screen').classList.remove('active');
+            document.getElementById('auth-screen').classList.remove('hidden');
+        };
+
+        // ================= درآمد خودکار معدن (هر ۱۰ ثانیه) =================
+        setInterval(() => {
+            if (gameState.mines > 0 && currentUser) {
+                const income = gameState.mines * 5;
+                gameState.coins += income;
+                saveUserData();
+                updateUI();
+            }
+        }, 10000);
 
         // ================= شروع =================
         window.addEventListener('load', () => {
@@ -626,7 +488,14 @@
                     clearInterval(interval);
                     setTimeout(() => {
                         document.getElementById('loading-screen').classList.add('hidden');
-                        updateUI();
+                        
+                        if (currentUser && getUsers()[currentUser]) {
+                            loadUserData(currentUser);
+                            document.getElementById('main-map-screen').classList.add('active');
+                            updateUI();
+                        } else {
+                            document.getElementById('auth-screen').classList.remove('hidden');
+                        }
                     }, 500);
                 }
             }, 100);
@@ -634,4 +503,4 @@
 
     </script>
 </body>
-    </html>
+                </html>
