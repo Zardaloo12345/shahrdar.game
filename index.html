@@ -5,161 +5,231 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
     <title>شهردار | امپراتوری</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; user-select: none; }
-        
-        /* پس‌زمینه و ساختار */
-        body {
-            background: #1a252f; display: flex; justify-content: center; align-items: center;
-            height: 100vh; width: 100vw; overflow: hidden; 
+        /* ================= متغیرها ================= */
+        :root {
+            --primary: #3498db;
+            --secondary: #9b59b6;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --dark: #1e1e2f;
+            --darker: #0f0f1a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
-        /* صفحه بارگذاری */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; user-select: none; }
+        body { background: linear-gradient(135deg, var(--dark), var(--darker)); display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; overflow: hidden; color: white; }
+
+        /* ================= صفحه بارگذاری ================= */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #1a252f; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            /* عکسی که فرستادی به عنوان پس‌زمینه */
+            background-image: url('loading-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 9999;
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+            padding-bottom: 60px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
         }
-        #loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .loader-logo { font-size: 60px; margin-bottom: 20px; animation: bounce 1s infinite alternate; }
-        .loader-title { color: #f1c40f; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
-        .progress-bar-container { width: 80%; max-width: 300px; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; overflow: hidden; }
-        .progress-bar { height: 100%; width: 0%; background: #f1c40f; transition: width 0.1s linear; }
-        .loading-text { color: white; font-size: 14px; margin-top: 15px; }
-        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
+        /* یک لایه تیره روی عکس برای اینکه نوشته‌ها دیده بشن */
+        #loading-screen::before {
+            content: '';
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent 70%);
+            z-index: 1;
+        }
 
-        /* صفحه ورود (قبل از نقشه) */
-        #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #1a252f; z-index: 5000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+        #loading-screen.hidden { opacity: 0; visibility: hidden; }
+
+        .loading-content {
+            position: relative; z-index: 2;
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
         }
+
+        .loader-title { 
+            color: var(--warning); font-size: 36px; font-weight: bold; 
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.8), 0 4px 10px rgba(0,0,0,0.8); 
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar-container { 
+            width: 300px; height: 15px; background: rgba(0,0,0,0.6); 
+            border-radius: 20px; overflow: hidden; border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .progress-bar { 
+            height: 100%; width: 0%; 
+            background: linear-gradient(90deg, #f1c40f, #e67e22); 
+            transition: width 0.1s linear; 
+            box-shadow: 0 0 15px #f1c40f;
+        }
+        .loading-text { 
+            color: white; font-size: 16px; font-weight: bold; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            letter-spacing: 1px;
+        }
+
+        /* ================= صفحه ورود ================= */
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--darker); z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
         #auth-screen.hidden { opacity: 0; visibility: hidden; }
-        .auth-box {
-            background: rgba(44, 62, 80, 0.9); padding: 30px; border-radius: 20px;
-            border: 2px solid #34495e; display: flex; flex-direction: column; gap: 15px;
-            width: 320px; text-align: center; backdrop-filter: blur(10px);
-        }
-        .auth-box h2 { color: #f1c40f; margin-bottom: 10px; }
-        .auth-box input { padding: 12px; border-radius: 10px; border: none; font-size: 16px; text-align: center; }
-        .auth-box button { padding: 12px; border-radius: 10px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
-        .btn-login { background: #27ae60; }
-        .btn-register { background: #3498db; }
+        .auth-box { background: var(--glass-bg); backdrop-filter: blur(10px); padding: 40px; border-radius: 25px; border: 2px solid var(--glass-border); display: flex; flex-direction: column; gap: 15px; width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .auth-box h2 { color: var(--warning); margin-bottom: 10px; }
+        .auth-box input { padding: 15px; border-radius: 12px; border: none; font-size: 16px; background: rgba(0,0,0,0.3); color: white; outline: none; border: 2px solid transparent; transition: 0.3s; }
+        .auth-box input:focus { border-color: var(--primary); }
+        .auth-box button { padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
 
         /* ================= صفحه اصلی (نقشه) ================= */
         #main-map-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; /* در ابتدا مخفی */
-            background-image: url('main-map.jpg');
+            display: none;
+            background-image: url('main-map.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.6);
         }
         #main-map-screen.active { display: block; }
+        
+        #main-map-screen::before {
+            content: '';
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
 
         /* نقاط داغ (Hotspots) */
         .hotspot {
-            position: absolute;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            position: absolute; border-radius: 50%; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             background-color: rgba(255, 255, 255, 0);
-            /* border: 2px solid red; */ /* برای تنظیم دقیق، این خط رو از کامنت دربیار */
+            z-index: 2;
         }
         .hotspot:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6), inset 0 0 20px rgba(255,255,255,0.3);
+            transform: scale(1.05);
         }
 
-        /* مختصات دقیق نقاط روی عکس */
-        #mine-1 { top: 15%; left: 12%; width: 18%; height: 22%; }
-        #mine-2 { top: 15%; right: 12%; width: 18%; height: 22%; }
-        #mine-3 { bottom: 20%; left: 12%; width: 18%; height: 22%; }
-        #portal { top: 35%; left: 42%; width: 16%; height: 25%; }
-        #bank { bottom: 20%; right: 15%; width: 18%; height: 22%; }
-        #chest { top: 10%; left: 46%; width: 8%; height: 12%; }
+        /* مختصات نقاط */
+        #mine-1 { top: 20%; left: 12%; width: 18%; height: 22%; }
+        #mine-2 { bottom: 25%; left: 12%; width: 18%; height: 22%; }
+        #mine-3 { bottom: 15%; right: 35%; width: 15%; height: 20%; }
+        #portal { top: 40%; left: 45%; width: 16%; height: 25%; }
+        #bank { top: 25%; right: 15%; width: 18%; height: 22%; }
+        #chest { top: 5%; left: 46%; width: 10%; height: 15%; }
 
         /* ================= نوار بالا (HUD) ================= */
-        .top-bar {
-            position: absolute; top: 15px; left: 15px; right: 15px;
-            display: flex; justify-content: space-between; align-items: flex-start; z-index: 20;
-            pointer-events: none;
-        }
-        .stat-container {
-            display: flex; gap: 10px; pointer-events: auto;
-        }
+        .top-bar { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 20; pointer-events: none; }
+        .stat-container { display: flex; gap: 10px; pointer-events: auto; }
         .stat-box {
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(15, 15, 26, 0.7); backdrop-filter: blur(10px);
+            padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
             color: white; font-weight: bold; font-size: 16px;
             display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .logout-btn {
-            background: #e74c3c; color: white; border: none; border-radius: 30px;
-            padding: 10px 20px; font-weight: bold; cursor: pointer; pointer-events: auto;
-        }
+        .logout-btn { background: #e74c3c; color: white; border: none; border-radius: 30px; padding: 10px 20px; font-weight: bold; cursor: pointer; pointer-events: auto; transition: 0.2s; }
 
         /* ================= مودال‌ها ================= */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
-            z-index: 100; backdrop-filter: blur(5px);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(8px); }
         .modal-overlay.active { display: flex; }
-        
         .modal-content {
-            background: #ecf0f1; padding: 30px; border-radius: 25px; 
-            width: 90%; max-width: 400px; text-align: center; color: #2c3e50;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            background: linear-gradient(135deg, #2c3e50, #1a252f); padding: 30px; border-radius: 25px; 
+            width: 90%; max-width: 400px; text-align: center; color: white;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
+            position: relative; border: 1px solid rgba(255,255,255,0.05);
         }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        .modal-icon { font-size: 60px; margin-bottom: 10px; }
-        .modal-content h2 { margin-bottom: 10px; font-size: 24px; color: #2980b9; }
-        .modal-content p { font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5; }
+        .modal-icon { font-size: 60px; margin-bottom: 15px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); }
+        .modal-content h2 { margin-bottom: 10px; font-size: 24px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .modal-content p { font-size: 14px; color: #bdc3c7; margin-bottom: 20px; line-height: 1.5; }
 
         .modal-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .modal-btn {
-            padding: 12px 20px; border: none; border-radius: 10px;
-            font-size: 15px; font-weight: bold; cursor: pointer; color: white;
-            flex: 1; transition: transform 0.2s;
-        }
-        .modal-btn:hover { transform: translateY(-2px); }
+        .modal-btn { padding: 12px 20px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; color: white; flex: 1; transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
+        .modal-btn:active { transform: translateY(4px); box-shadow: none; }
         .btn-green { background: #27ae60; }
         .btn-red { background: #e74c3c; }
         .btn-blue { background: #3498db; }
         .btn-purple { background: #9b59b6; }
 
         /* ورودی بانک */
-        .bank-input {
-            width: 100%; padding: 15px; font-size: 18px; text-align: center;
-            border: 2px solid #3498db; border-radius: 10px; margin-bottom: 15px;
-            background: #fff; font-weight: bold; color: #2c3e50;
-        }
-        .bank-input:focus { outline: none; border-color: #2980b9; }
+        .bank-input { width: 100%; padding: 15px; font-size: 18px; text-align: center; border: 2px solid #3498db; border-radius: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); color: white; font-weight: bold; }
+        .bank-input:focus { outline: none; border-color: #f1c40f; }
 
         /* اعلان (Toast) */
         .toast-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .toast { background: rgba(30, 30, 47, 0.95); color: white; padding: 15px 30px; border-radius: 30px; font-size: 15px; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; border-left: 5px solid #f1c40f; }
+        .toast { background: rgba(15, 15, 26, 0.95); color: white; padding: 15px 30px; border-radius: 30px; font-size: 15px; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.6); animation: slideUp 0.3s ease-out; border-left: 5px solid #f1c40f; backdrop-filter: blur(5px); }
         @keyframes slideUp { 0% { transform: translateY(-30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+        /* ================= کارت‌دونی ================= */
+        .card-collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-height: 300px; overflow-y: auto; padding: 10px; margin-bottom: 20px; }
+        .collection-card { background: #ecf0f1; border-radius: 12px; padding: 10px; text-align: center; color: #2c3e50; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.3s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid transparent; }
+        .collection-card.owned { border-color: #f1c40f; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
+        .collection-card.not-owned { filter: grayscale(100%); opacity: 0.5; }
+        .collection-card .icon { font-size: 35px; margin-bottom: 5px; }
+        .collection-card .name { font-size: 12px; font-weight: bold; }
+        .collection-card .power { font-size: 11px; color: #e74c3c; font-weight: bold; margin-top: 3px; }
+        .collection-card .rarity-badge { position: absolute; top: -5px; right: -5px; font-size: 10px; padding: 2px 6px; border-radius: 8px; color: white; }
+        .rarity-common .rarity-badge { background: #95a5a6; }
+        .rarity-rare .rarity-badge { background: #3498db; }
+        .rarity-legendary .rarity-badge { background: #9b59b6; }
+
+        /* ================= صفحه نبرد ================= */
+        #battle-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a252f, #0f0f1a); display: none; flex-direction: column; justify-content: space-between; z-index: 300; padding: 20px; box-sizing: border-box; }
+        #battle-screen.active { display: flex; }
+
+        .battle-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .battle-char { display: flex; flex-direction: column; align-items: center; width: 45%; }
+        .battle-avatar { font-size: 80px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); transition: transform 0.2s; }
+        .battle-avatar.hit { animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .battle-name { font-weight: bold; font-size: 18px; color: #f1c40f; margin-top: 5px; }
+        .battle-hp-bar { width: 100%; height: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 2px solid #fff; margin-top: 10px; overflow: hidden; }
+        .battle-hp-fill { height: 100%; width: 100%; transition: width 0.3s; }
+        .battle-player .battle-hp-fill { background: #27ae60; }
+        .battle-enemy .battle-hp-fill { background: #e74c3c; }
+        .battle-hp-text { font-size: 12px; margin-top: 5px; color: #ccc; }
+
+        .battle-hand { display: flex; justify-content: center; gap: 10px; overflow-x: auto; padding-bottom: 10px; min-height: 150px; align-items: flex-end; }
+        .battle-card { width: 90px; height: 130px; flex-shrink: 0; background: #fff; border-radius: 15px; border: 3px solid #ddd; box-shadow: 0 5px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 10px; cursor: pointer; transition: all 0.3s; position: relative; }
+        .battle-card:hover { transform: translateY(-10px); border-color: #f1c40f; }
+        .battle-card.selected { border-color: #e74c3c; box-shadow: 0 0 20px #e74c3c; transform: translateY(-10px); }
+        .battle-card .icon { font-size: 35px; margin-top: 5px; }
+        .battle-card .name { font-size: 12px; font-weight: bold; color: #2c3e50; }
+        .battle-card .power { font-size: 11px; color: #e74c3c; font-weight: bold; background: #fadbd8; padding: 2px 6px; border-radius: 6px; }
+
+        .battle-actions { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+        .battle-action-btn { padding: 12px 25px; border-radius: 30px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-attack-battle { background: #e74c3c; color: white; box-shadow: 0 6px 0 #c0392b; }
+        .btn-attack-battle:active { transform: translateY(6px); box-shadow: none; }
+        .btn-attack-battle:disabled { filter: grayscale(1); cursor: not-allowed; }
+        .btn-retreat { background: #7f8c8d; color: white; box-shadow: 0 6px 0 #555; }
+
+        /* افکت ضربه */
+        .damage-text-battle { position: absolute; color: #e74c3c; font-size: 40px; font-weight: bold; text-shadow: 0 0 10px #000; animation: damageAnim 1s forwards; pointer-events: none; z-index: 400; }
+        @keyframes damageAnim { 0% { transform: scale(0.5) translateY(0); opacity: 1; } 100% { transform: scale(1.5) translateY(-50px); opacity: 0; } }
 
     </style>
 </head>
 <body id="main-body">
 
-    <!-- صفحه بارگذاری -->
+    <!-- صفحه بارگذاری (با عکس جدید) -->
     <div id="loading-screen">
-        <div class="loader-logo">🗺️</div>
-        <div class="loader-title">شهردار | امپراتوری</div>
-        <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
-        <div class="loading-text">در حال آماده‌سازی نقشه...</div>
+        <div class="loading-content">
+            <div class="loader-title">شهردار | امپراتوری</div>
+            <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
+            <div class="loading-text" id="loading-text">در حال آماده‌سازی...</div>
+        </div>
     </div>
 
-    <!-- صفحه ورود -->
     <div id="auth-screen" class="hidden">
         <div class="auth-box">
             <h2>ورود به امپراتوری</h2>
@@ -172,7 +242,6 @@
 
     <!-- صفحه اصلی (نقشه) -->
     <div id="main-map-screen">
-        <!-- نوار بالا -->
         <div class="top-bar">
             <div class="stat-container">
                 <div class="stat-box">🪙 <span id="coin-display">1000</span></div>
@@ -182,85 +251,57 @@
             <button class="logout-btn" id="btn-logout">خروج</button>
         </div>
 
-        <!-- نقاط داغ (روی عکس) -->
         <div class="hotspot" id="mine-1" title="معدن ۱"></div>
         <div class="hotspot" id="mine-2" title="معدن ۲"></div>
         <div class="hotspot" id="mine-3" title="معدن ۳"></div>
         <div class="hotspot" id="portal" title="پرتال حمله"></div>
         <div class="hotspot" id="bank" title="بانک"></div>
-        <div class="hotspot" id="chest" title="صندوق جایزه"></div>
+        <div class="hotspot" id="chest" title="کارت‌دونی"></div>
     </div>
 
-    <!-- مودال معدن -->
-    <div class="modal-overlay" id="mine-modal">
-        <div class="modal-content">
-            <div class="modal-icon">⛏️</div>
-            <h2>معدن طلا</h2>
-            <p>هر معدن در هر ۱۰ ثانیه ۵ سکه تولید می‌کند.</p>
-            <p style="font-weight:bold; color:#e67e22;">تعداد معدن‌های شما: <span id="modal-mine-count">0</span></p>
-            <div class="modal-buttons">
-                <button class="modal-btn btn-green" id="btn-buy-mine">خرید معدن (۵۰۰ سکه)</button>
-            </div>
-            <button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('mine-modal')">بستن</button>
-        </div>
-    </div>
+    <!-- مودال‌ها -->
+    <div class="modal-overlay" id="mine-modal"><div class="modal-content"><div class="modal-icon">⛏️</div><h2>معدن طلا</h2><p>هر معدن در هر ۱۰ ثانیه ۵ سکه تولید می‌کند.</p><p style="font-weight:bold; color:#f1c40f;">تعداد معدن‌های شما: <span id="modal-mine-count">0</span></p><div class="modal-buttons"><button class="modal-btn btn-green" id="btn-buy-mine">خرید معدن (۵۰۰ سکه)</button></div><button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('mine-modal')">بستن</button></div></div>
+    
+    <div class="modal-overlay" id="portal-modal"><div class="modal-content"><div class="modal-icon">🌀</div><h2>پرتال حمله</h2><p>دشمن خود را انتخاب کنید:</p><div id="portal-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px;"></div><button class="modal-btn btn-red" onclick="closeModal('portal-modal')">بستن</button></div></div>
+    
+    <div class="modal-overlay" id="bank-modal"><div class="modal-content"><div class="modal-icon">🏦</div><h2>بانک</h2><p>موجودی بانک: <span id="modal-bank-balance">0</span> سکه</p><input type="number" class="bank-input" id="bank-amount" placeholder="مقدار..."><div class="modal-buttons"><button class="modal-btn btn-blue" id="btn-deposit">واریز</button><button class="modal-btn btn-green" id="btn-withdraw">برداشت</button></div><button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('bank-modal')">بستن</button></div></div>
+    
+    <div class="modal-overlay" id="card-modal"><div class="modal-content" style="max-width: 500px;"><div class="modal-icon">🎴</div><h2>کارت‌دونی</h2><p>تمام کارت‌های بازی</p><div class="card-collection-grid" id="card-collection-grid"></div><button class="modal-btn btn-red" onclick="closeModal('card-modal')">بستن</button></div></div>
 
-    <!-- مودال پرتال (حمله) -->
-    <div class="modal-overlay" id="portal-modal">
-        <div class="modal-content">
-            <div class="modal-icon">🌀</div>
-            <h2>پرتال حمله</h2>
-            <p>دشمن خود را انتخاب کنید:</p>
-            <div id="portal-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px;">
-                <!-- لیست بازیکنان با JS پر میشه -->
-            </div>
-            <button class="modal-btn btn-red" onclick="closeModal('portal-modal')">بستن</button>
+    <!-- صفحه نبرد -->
+    <div id="battle-screen">
+        <div class="battle-top">
+            <div class="battle-char battle-player"><div class="battle-avatar" id="battle-player-avatar">🍢</div><div class="battle-name" id="battle-player-name">شما</div><div class="battle-hp-bar"><div class="battle-hp-fill" id="battle-player-hp"></div></div><div class="battle-hp-text" id="battle-player-hp-text">HP: 100 / 100</div></div>
+            <div style="font-size: 30px; color: #f1c40f; font-weight: bold; align-self: center;">VS</div>
+            <div class="battle-char battle-enemy"><div class="battle-avatar" id="battle-enemy-avatar">👹</div><div class="battle-name" id="battle-enemy-name">دشمن</div><div class="battle-hp-bar"><div class="battle-hp-fill" id="battle-enemy-hp"></div></div><div class="battle-hp-text" id="battle-enemy-hp-text">HP: 100 / 100</div></div>
         </div>
-    </div>
-
-    <!-- مودال بانک -->
-    <div class="modal-overlay" id="bank-modal">
-        <div class="modal-content">
-            <div class="modal-icon">🏦</div>
-            <h2>بانک</h2>
-            <p>موجودی بانک: <span id="modal-bank-balance">0</span> سکه</p>
-            <input type="number" class="bank-input" id="bank-amount" placeholder="مقدار...">
-            <div class="modal-buttons">
-                <button class="modal-btn btn-blue" id="btn-deposit">واریز</button>
-                <button class="modal-btn btn-green" id="btn-withdraw">برداشت</button>
-            </div>
-            <button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('bank-modal')">بستن</button>
-        </div>
-    </div>
-
-    <!-- مودال صندوق جایزه -->
-    <div class="modal-overlay" id="chest-modal">
-        <div class="modal-content">
-            <div class="modal-icon">🎁</div>
-            <h2>صندوق جایزه روزانه</h2>
-            <p>هر ۲۴ ساعت یک بار می‌توانید جایزه بگیرید!</p>
-            <button class="modal-btn btn-green" id="btn-claim-chest">دریافت جایزه</button>
-            <button class="modal-btn btn-red" style="margin-top:10px;" onclick="closeModal('chest-modal')">بستن</button>
-        </div>
-    </div>
-
-    <!-- مودال نبرد (ساده شده) -->
-    <div class="modal-overlay" id="battle-modal">
-        <div class="modal-content">
-            <div class="modal-icon">⚔️</div>
-            <h2 id="battle-title">نبرد!</h2>
-            <p id="battle-desc">در حال نبرد با دشمن...</p>
-            <button class="modal-btn btn-red" onclick="closeModal('battle-modal')">بستن</button>
-        </div>
+        <div class="battle-hand" id="battle-hand"></div>
+        <div class="battle-actions"><button class="battle-action-btn btn-attack-battle" id="btn-battle-attack" disabled>حمله!</button><button class="battle-action-btn btn-retreat" id="btn-retreat">فرار</button></div>
     </div>
 
     <div class="toast-container" id="toast-container"></div>
 
     <script>
+        // ================= دیتای کارت‌ها =================
+        const cardsData = [
+            { id: 'bread', name: 'نان', icon: '🍞', img: 'card_bread.png', cost: 10, power: 5, rarity: 'common' },
+            { id: 'pizza', name: 'پیتزا', icon: '🍕', img: 'card_pizza.png', cost: 20, power: 15, rarity: 'rare' },
+            { id: 'tea', name: 'چای', icon: '☕', img: 'card_tea.png', cost: 5, power: 2, rarity: 'common' },
+            { id: 'icecream', name: 'بستنی', icon: '🍦', img: 'card_icecream.png', cost: 15, power: 10, rarity: 'common' },
+            { id: 'kebab', name: 'کباب', icon: '🍢', img: 'card_kebab.png', cost: 30, power: 30, rarity: 'legendary' },
+            { id: 'fire', name: 'آتش', icon: '🔥', img: 'card_fire.png', cost: 50, power: 40, rarity: 'legendary' }
+        ];
+
         // ================= متغیرها =================
         let currentUser = localStorage.getItem('game_current_user') || null;
         let gameState = {
-            coins: 1000, diamonds: 0, level: 1, bank: 0, mines: 0, lastChestTime: 0
+            coins: 1000, diamonds: 0, level: 1, bank: 0, mines: 0, lastChestTime: 0,
+            ownedCards: []
+        };
+
+        let battleState = {
+            playerHp: 100, playerMaxHp: 100, enemyHp: 100, enemyMaxHp: 100,
+            enemyName: '', selectedCard: null, enemyAttackInterval: null, isActive: false
         };
 
         // ================= دیتابیس =================
@@ -286,7 +327,8 @@
             const users = getUsers();
             users[currentUser] = {
                 coins: gameState.coins, diamonds: gameState.diamonds, level: gameState.level,
-                bank: gameState.bank, mines: gameState.mines, lastChestTime: gameState.lastChestTime
+                bank: gameState.bank, mines: gameState.mines, lastChestTime: gameState.lastChestTime,
+                ownedCards: gameState.ownedCards
             };
             saveUsers(users);
         }
@@ -301,87 +343,197 @@
                 gameState.bank = data.bank || 0;
                 gameState.mines = data.mines || 0;
                 gameState.lastChestTime = data.lastChestTime || 0;
+                gameState.ownedCards = data.ownedCards || [];
             }
         }
 
-        // ================= آپدیت UI =================
         function updateUI() {
             document.getElementById('coin-display').textContent = gameState.coins;
             document.getElementById('diamond-display').textContent = gameState.diamonds;
             document.getElementById('bank-display').textContent = gameState.bank;
-            
-            // به‌روزرسانی مودال‌ها اگر باز باشند
             document.getElementById('modal-bank-balance').textContent = gameState.bank;
             document.getElementById('modal-mine-count').textContent = gameState.mines;
         }
 
-        // ================= شروع نبرد (شبیه‌سازی) =================
+        // ================= کارت‌دونی =================
+        function renderCardCollection() {
+            const grid = document.getElementById('card-collection-grid');
+            grid.innerHTML = '';
+
+            cardsData.forEach(card => {
+                const isOwned = gameState.ownedCards.includes(card.id);
+                const el = document.createElement('div');
+                el.className = `collection-card ${isOwned ? 'owned' : 'not-owned'} rarity-${card.rarity}`;
+                
+                el.innerHTML = `
+                    <div class="rarity-badge">${card.rarity === 'legendary' ? 'افسانه' : card.rarity === 'rare' ? 'نادر' : 'معمولی'}</div>
+                    <div class="icon">${card.icon}</div>
+                    <div class="name">${card.name}</div>
+                    <div class="power">⚔️ ${card.power}</div>
+                `;
+                grid.appendChild(el);
+            });
+        }
+
+        // ================= شروع نبرد =================
         function startBattleWithPlayer(enemyUsername) {
             closeModal('portal-modal');
-            openModal('battle-modal');
-            document.getElementById('battle-title').textContent = `نبرد با ${enemyUsername}`;
-            document.getElementById('battle-desc').textContent = 'در حال شبیه‌سازی نبرد...';
+            
+            battleState.playerHp = 100;
+            battleState.playerMaxHp = 100;
+            battleState.enemyHp = 100;
+            battleState.enemyMaxHp = 100;
+            battleState.enemyName = enemyUsername;
+            battleState.selectedCard = null;
+            battleState.isActive = true;
 
-            // شبیه‌سازی نتیجه نبرد
+            document.getElementById('battle-player-name').textContent = currentUser || 'شما';
+            document.getElementById('battle-enemy-name').textContent = enemyUsername;
+            
+            updateBattleUI();
+            renderBattleHand();
+
+            document.getElementById('main-map-screen').classList.remove('active');
+            document.getElementById('battle-screen').classList.add('active');
+
+            if (battleState.enemyAttackInterval) clearInterval(battleState.enemyAttackInterval);
+            battleState.enemyAttackInterval = setInterval(() => {
+                if (!battleState.isActive) return;
+                
+                const damage = Math.floor(Math.random() * 10) + 5;
+                battleState.playerHp -= damage;
+                
+                const playerAvatar = document.getElementById('battle-player-avatar');
+                playerAvatar.classList.add('hit');
+                setTimeout(() => playerAvatar.classList.remove('hit'), 300);
+                
+                showToast(`${enemyUsername} به تو ${damage} ضربه زد!`, '#e74c3c');
+                
+                if (battleState.playerHp <= 0) {
+                    battleState.playerHp = 0;
+                    endBattle(false);
+                }
+                updateBattleUI();
+            }, 3000);
+        }
+
+        function renderBattleHand() {
+            const hand = document.getElementById('battle-hand');
+            hand.innerHTML = '';
+            
+            gameState.ownedCards.forEach((cardId, index) => {
+                const card = cardsData.find(c => c.id === cardId);
+                if (!card) return;
+
+                const el = document.createElement('div');
+                el.className = `battle-card ${battleState.selectedCard === index ? 'selected' : ''}`;
+                el.innerHTML = `
+                    <div class="icon">${card.icon}</div>
+                    <div class="name">${card.name}</div>
+                    <div class="power">⚔️ ${card.power}</div>
+                `;
+                
+                el.onclick = () => {
+                    if (!battleState.isActive) return;
+                    battleState.selectedCard = (battleState.selectedCard === index) ? null : index;
+                    renderBattleHand();
+                    document.getElementById('btn-battle-attack').disabled = battleState.selectedCard === null;
+                };
+                hand.appendChild(el);
+            });
+        }
+
+        function updateBattleUI() {
+            const playerPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
+            const enemyPercent = (battleState.enemyHp / battleState.enemyMaxHp) * 100;
+            
+            document.getElementById('battle-player-hp').style.width = playerPercent + '%';
+            document.getElementById('battle-enemy-hp').style.width = enemyPercent + '%';
+            
+            document.getElementById('battle-player-hp-text').textContent = `HP: ${battleState.playerHp} / ${battleState.playerMaxHp}`;
+            document.getElementById('battle-enemy-hp-text').textContent = `HP: ${battleState.enemyHp} / ${battleState.enemyMaxHp}`;
+        }
+
+        // ================= حمله بازیکن =================
+        document.getElementById('btn-battle-attack').onclick = () => {
+            if (battleState.selectedCard === null || !battleState.isActive) return;
+            
+            const cardId = gameState.ownedCards[battleState.selectedCard];
+            const card = cardsData.find(c => c.id === cardId);
+            if (!card) return;
+
+            battleState.enemyHp -= card.power;
+            
+            const enemyAvatar = document.getElementById('battle-enemy-avatar');
+            enemyAvatar.classList.add('hit');
+            setTimeout(() => enemyAvatar.classList.remove('hit'), 300);
+            
+            const damageText = document.createElement('div');
+            damageText.className = 'damage-text-battle';
+            damageText.textContent = `-${card.power}`;
+            damageText.style.left = '70%';
+            damageText.style.top = '30%';
+            document.getElementById('battle-screen').appendChild(damageText);
+            setTimeout(() => damageText.remove(), 1000);
+
+            showToast(`با کارت ${card.name} ضربه ${card.power} وارد کردی!`, '#e74c3c');
+
+            // حذف کارت مصرف شده
+            gameState.ownedCards.splice(battleState.selectedCard, 1);
+            battleState.selectedCard = null;
+            
+            saveUserData();
+            renderBattleHand();
+            document.getElementById('btn-battle-attack').disabled = true;
+
+            if (battleState.enemyHp <= 0) {
+                battleState.enemyHp = 0;
+                endBattle(true);
+            }
+            updateBattleUI();
+        };
+
+        // ================= پایان نبرد =================
+        function endBattle(isWin) {
+            battleState.isActive = false;
+            clearInterval(battleState.enemyAttackInterval);
+
             setTimeout(() => {
-                const win = Math.random() > 0.3;
-                if (win) {
-                    const reward = 100 + Math.floor(Math.random() * 50);
+                document.getElementById('battle-screen').classList.remove('active');
+                document.getElementById('main-map-screen').classList.add('active');
+
+                if (isWin) {
+                    const reward = 100 + (gameState.level * 10);
                     gameState.coins += reward;
                     gameState.level++;
                     showToast(`🎉 بردی! جایزه: ${reward} سکه`, '#27ae60');
-                    document.getElementById('battle-desc').textContent = `بردی! جایزه: ${reward} سکه`;
                 } else {
-                    showToast('💀 باختی! دشمن قوی‌تر بود.', '#e74c3c');
-                    document.getElementById('battle-desc').textContent = 'باختی! دفعه بعد قوی‌تر برگرد.';
+                    showToast('💀 باختی! دفعه بعد قوی‌تر برگرد.', '#e74c3c');
                 }
+                
                 saveUserData();
                 updateUI();
-                setTimeout(() => closeModal('battle-modal'), 2000);
+                renderBattleHand();
             }, 1500);
         }
 
-        // ================= لیست پرتال =================
-        function renderPortalList() {
-            const list = document.getElementById('portal-list');
-            list.innerHTML = '';
-            const users = getUsers();
-            let count = 0;
-
-            for (const username in users) {
-                if (username === currentUser) continue;
-                if (count >= 5) break;
-
-                const user = users[username];
-                const el = document.createElement('div');
-                el.style.cssText = 'background: #2c3e50; padding: 10px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: white;';
-                el.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold; color:#3498db;">${username}</div>
-                        <div style="font-size:12px; color:#aaa;">سطح: ${user.level}</div>
-                    </div>
-                    <button class="modal-btn btn-red" style="padding:5px 10px; font-size:12px;" onclick="startBattleWithPlayer('${username}')">حمله</button>
-                `;
-                list.appendChild(el);
-                count++;
-            }
-
-            if (count === 0) {
-                list.innerHTML = '<div style="color:#aaa; text-align:center;">هنوز بازیکن دیگری ثبت‌نام نکرده!</div>';
-            }
-        }
+        document.getElementById('btn-retreat').onclick = () => {
+            battleState.isActive = false;
+            clearInterval(battleState.enemyAttackInterval);
+            document.getElementById('battle-screen').classList.remove('active');
+            document.getElementById('main-map-screen').classList.add('active');
+            showToast('از نبرد فرار کردی!', '#f39c12');
+        };
 
         // ================= رویدادهای نقاط داغ =================
         document.getElementById('mine-1').onclick = () => openModal('mine-modal');
         document.getElementById('mine-2').onclick = () => openModal('mine-modal');
         document.getElementById('mine-3').onclick = () => openModal('mine-modal');
-        
         document.getElementById('portal').onclick = () => { renderPortalList(); openModal('portal-modal'); };
         document.getElementById('bank').onclick = () => openModal('bank-modal');
-        document.getElementById('chest').onclick = () => openModal('chest-modal');
+        document.getElementById('chest').onclick = () => { renderCardCollection(); openModal('card-modal'); };
 
         // ================= عملکرد مودال‌ها =================
-        // خرید معدن
         document.getElementById('btn-buy-mine').onclick = () => {
             const cost = 500 + (gameState.mines * 100);
             if (gameState.coins < cost) return showToast('سکه کافی ندارید!', '#e74c3c');
@@ -392,7 +544,6 @@
             showToast('معدن جدید خریداری شد!', '#27ae60');
         };
 
-        // بانک: واریز و برداشت
         document.getElementById('btn-deposit').onclick = () => {
             const amount = parseInt(document.getElementById('bank-amount').value);
             if (isNaN(amount) || amount <= 0) return showToast('مقدار معتبر وارد کنید!', '#e74c3c');
@@ -417,22 +568,34 @@
             showToast(`${amount} سکه از بانک برداشت شد.`, '#f39c12');
         };
 
-        // صندوق جایزه
-        document.getElementById('btn-claim-chest').onclick = () => {
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            if (now - gameState.lastChestTime < oneDay) {
-                const hours = Math.ceil((oneDay - (now - gameState.lastChestTime)) / (1000 * 60 * 60));
-                return showToast(`جایزه بعدی تا ${hours} ساعت دیگر!`, '#e74c3c');
+        function renderPortalList() {
+            const list = document.getElementById('portal-list');
+            list.innerHTML = '';
+            const users = getUsers();
+            let count = 0;
+
+            for (const username in users) {
+                if (username === currentUser) continue;
+                if (count >= 5) break;
+
+                const user = users[username];
+                const el = document.createElement('div');
+                el.style.cssText = 'background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: white; border: 1px solid rgba(255,255,255,0.1);';
+                el.innerHTML = `
+                    <div>
+                        <div style="font-weight:bold; color:#3498db;">${username}</div>
+                        <div style="font-size:12px; color:#aaa;">سطح: ${user.level}</div>
+                    </div>
+                    <button class="modal-btn btn-red" style="padding:5px 10px; font-size:12px; box-shadow:none;" onclick="startBattleWithPlayer('${username}')">حمله</button>
+                `;
+                list.appendChild(el);
+                count++;
             }
-            const reward = 100;
-            gameState.coins += reward;
-            gameState.lastChestTime = now;
-            saveUserData();
-            updateUI();
-            closeModal('chest-modal');
-            showToast(`🎁 ${reward} سکه جایزه گرفتید!`, '#f1c40f');
-        };
+
+            if (count === 0) {
+                list.innerHTML = '<div style="color:#aaa; text-align:center;">هنوز بازیکن دیگری ثبت‌نام نکرده!</div>';
+            }
+        }
 
         // ================= ورود و ثبت‌نام =================
         document.getElementById('btn-login').onclick = () => {
@@ -456,7 +619,10 @@
             if (!username || !password) return showToast('نام و رمز را پر کن!', '#e74c3c');
             const users = getUsers();
             if (users[username]) return showToast('این نام قبلاً گرفته شده!', '#e74c3c');
-            users[username] = { password, coins: 1000, diamonds: 0, level: 1, bank: 0, mines: 0, lastChestTime: 0 };
+            users[username] = { 
+                password, coins: 1000, diamonds: 0, level: 1, bank: 0, mines: 0, lastChestTime: 0,
+                ownedCards: ['bread'] // هدیه
+            };
             saveUsers(users);
             showToast('ثبت‌نام موفق! حالا وارد شو.', '#27ae60');
         };
@@ -468,7 +634,7 @@
             document.getElementById('auth-screen').classList.remove('hidden');
         };
 
-        // ================= درآمد خودکار معدن (هر ۱۰ ثانیه) =================
+        // ================= درآمد خودکار معدن =================
         setInterval(() => {
             if (gameState.mines > 0 && currentUser) {
                 const income = gameState.mines * 5;
@@ -503,4 +669,4 @@
 
     </script>
 </body>
-                </html>
+    </html>
